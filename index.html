@@ -163,21 +163,50 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 const titles={books:["The Library","Every book is a doorway to somewhere new"],movies:["The Video Store","Rewind the memories. Pick tonight's feature."],games:["Welcome to the Guild Hall","Choose your next quest from the guild's collection"],kids:["The Enchanted Storybook Forest","Little stories, big adventures ✨"]};
 function current(){let list=items.filter(x=>section(x)===tab),q=$("search").value.trim().toLowerCase(),g=$("genre").value,st=$("status").value;
 if(q)list=list.filter(x=>[x.title,x.genre,x.author,x.format].some(a=>String(a||"").toLowerCase().includes(q)));
-if(g)list=list.filter(x=>x.genre===g);
+if(g)list=list.filter(x=>genreParts(x.genre).includes(g));
 if(st)list=list.filter(x=>st==="out"?/lent|loan|borrow|out/i.test(x.status||""):!/lent|loan|borrow|out/i.test(x.status||""));
 list.sort((a,b)=>String(a.title).localeCompare(String(b.title))*($("sort").value==="za"?-1:1));return list}
-function genres(){const prev=$("genre").value;const a=[...new Set(items.filter(x=>section(x)===tab).map(x=>x.genre).filter(Boolean))].sort();$("genre").innerHTML='<option value="">All genres</option>'+a.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");$("genre").value=a.includes(prev)?prev:""}
+function genreParts(value){return [...new Set(String(value||"").split(/\s*\/\s*|\s*[,;|&+]\s*|\s+and\s+/i).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/\s+/g," ")))]}\nfunction genres(){const prev=$("genre").value;const a=[...new Set(items.filter(x=>section(x)===tab).flatMap(x=>genreParts(x.genre)))].sort((a,b)=>a.localeCompare(b));$("genre").innerHTML='<option value="">All genres</option>'+a.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");$("genre").value=a.includes(prev)?prev:""}
+/* Artwork cache is separate from user edits, so existing local catalog data is preserved. */
+const ART_KEY="tts_artwork_v1";
+let artCache={};try{artCache=JSON.parse(localStorage.getItem(ART_KEY)||"{}")||{}}catch(e){}
+const artworkQueue=[];let artworkActive=0;
+function artKey(x){return String(x.type)+"|"+String(x.title).toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}
+function coverFor(x){return x.cover||artCache[artKey(x)]||""}
+function saveArt(key,url){artCache[key]=url||"";try{localStorage.setItem(ART_KEY,JSON.stringify(artCache))}catch(e){}}
+function tidyTitle(s){return String(s).replace(/\s*\([^)]*(?:dvd|blu-ray|edition|collection|movie)[^)]*\)/ig,"").replace(/\s*:\s*\d+[- ]?(?:movie|film)\s*(?:collection|pack)/ig,"").trim()}
+async function fetchJSON(url){const c=new AbortController(),t=setTimeout(()=>c.abort(),7500);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error("HTTP "+r.status);return await r.json()}finally{clearTimeout(t)}}
+async function findArtwork(x){
+ const title=tidyTitle(x.title),query=encodeURIComponent(title);
+ if(x.type==="Book"){
+   try{const d=await fetchJSON("https://openlibrary.org/search.json?title="+query+"&limit=5&fields=title,author_name,cover_i");const norm=t=>String(t||"").toLowerCase().replace(/[^a-z0-9]/g,"");const hits=(d.docs||[]).filter(a=>a.cover_i);const exact=hits.find(a=>norm(a.title)===norm(title));const hit=exact||hits[0];if(hit)return "https://covers.openlibrary.org/b/id/"+hit.cover_i+"-M.jpg"}catch(e){}
+   try{const d=await fetchJSON("https://www.googleapis.com/books/v1/volumes?q=intitle:"+query+"&maxResults=5");const hit=(d.items||[]).find(a=>a.volumeInfo?.imageLinks);if(hit)return (hit.volumeInfo.imageLinks.thumbnail||hit.volumeInfo.imageLinks.smallThumbnail||"").replace(/^http:/,"https:").replace(/&edge=curl/,"")}catch(e){}
+ }
+ if(x.type==="Movie"){
+   try{const d=await fetchJSON("https://itunes.apple.com/search?term="+query+"&entity=movie&limit=8");const norm=t=>String(t||"").toLowerCase().replace(/[^a-z0-9]/g,"");const hit=(d.results||[]).find(a=>norm(a.trackName)===norm(title)&&a.artworkUrl100);if(hit)return hit.artworkUrl100.replace(/\d+x\d+bb/,"600x900bb")}catch(e){}
+ }
+ if(x.type==="Game"){
+   try{const d=await fetchJSON("https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent('intitle:"'+title+'" board game')+"&gsrlimit=4&prop=pageimages&pithumbsize=500&format=json&origin=*");const pages=Object.values(d.query?.pages||{});const norm=t=>String(t||"").toLowerCase().replace(/[^a-z0-9]/g,"");const hit=pages.find(p=>norm(p.title).includes(norm(title))&&p.thumbnail?.source);if(hit)return hit.thumbnail.source}catch(e){}
+ }
+ return "";
+}
+function queueArtwork(x){const key=artKey(x);if(x.cover||Object.prototype.hasOwnProperty.call(artCache,key)||artworkQueue.some(y=>artKey(y)===key))return;artworkQueue.push(x);pumpArtwork()}
+function pumpArtwork(){while(artworkActive<3&&artworkQueue.length){const x=artworkQueue.shift(),key=artKey(x);artworkActive++;findArtwork(x).then(url=>{saveArt(key,url);if(url){document.querySelectorAll(".item[data-id='"+CSS.escape(String(x.id))+"'] .cover").forEach(el=>{if(!el.querySelector("img")){const img=document.createElement("img");img.loading="lazy";img.alt="";img.src=url;img.onerror=()=>{img.remove();saveArt(key,"")};el.appendChild(img)}})}}).catch(()=>saveArt(key,"")).finally(()=>{artworkActive--;pumpArtwork()})}}
+function cardHTML(x){const cover=coverFor(x);return '<button class="item" data-id="'+esc(x.id)+'" title="View or edit '+esc(x.title)+'"><span class="cover"><span>'+esc(x.title)+'</span>'+(cover?'<img loading="lazy" src="'+esc(cover)+'" alt="" onerror="this.remove()">':"")+'</span><span class="label">'+esc(x.title)+'</span>'+(/lent|loan|borrow|out/i.test(x.status||"")?'<small>● Lent out</small>':"")+'</button>'}
+function paintCards(list){$("cards").innerHTML=list.length?list.map(cardHTML).join(""):'<div class="empty">Nothing on this shelf yet.</div>';observeArtwork()}
+let coverObserver;
+function observeArtwork(){if(coverObserver)coverObserver.disconnect();coverObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting)continue;coverObserver.unobserve(entry.target);const x=items.find(a=>String(a.id)===entry.target.dataset.id);if(x)queueArtwork(x)}},{rootMargin:"500px"});document.querySelectorAll(".item").forEach(el=>coverObserver.observe(el))}
 function render(){const [h,p]=titles[tab];document.body.dataset.tab=tab;$("heading").textContent=h;$("subheading").textContent=p;
 document.querySelectorAll("[data-go]").forEach(x=>x.setAttribute("aria-selected",x.dataset.go===tab?"true":"false"));
 genres();const list=current();const total=items.filter(x=>section(x)===tab).length;
 $("summary").textContent=list.length+" shown · "+total+" in this section · "+items.length+" items total";
-$("cards").innerHTML=list.length?list.map(x=>'<button class="item" data-id="'+esc(x.id)+'" title="View or edit '+esc(x.title)+'"><span class="cover"><span>'+esc(x.title)+'</span>'+(x.cover?'<img loading="lazy" src="'+esc(x.cover)+'" alt="" onerror="this.remove()">':"")+'</span><span class="label">'+esc(x.title)+'</span>'+(/lent|loan|borrow|out/i.test(x.status||"")?'<small>● Lent out</small>':"")+'</button>').join(""):'<div class="empty">Nothing on this shelf yet.</div>';}
+paintCards(list)}
 function switchTab(next){tab=next;$("search").value="";$("genre").value="";render();window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>switchTab(b.dataset.go));
 $("cards").addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(b)edit(b.dataset.id)});
 function edit(id){editing=id==null?null:id;let x=editing==null?{title:"",type:tab==="movies"?"Movie":tab==="games"?"Game":"Book",genre:"",format:"",author:"",status:"Available",cover:"",kids:tab==="kids"}:items.find(x=>String(x.id)===String(id));if(!x)return;
 $("editTitle").textContent=editing==null?"Add to collection":"Edit item";
-for(const [key,val] of Object.entries({fTitle:x.title,fType:x.type,fGenre:x.genre,fFormat:x.format,fAuthor:x.author,fStatus:/lent|loan|borrow|out/i.test(x.status||"")?"Lent Out":"Available",fCover:x.cover}))$(key).value=val||"";
+for(const [key,val] of Object.entries({fTitle:x.title,fType:x.type,fGenre:x.genre,fFormat:x.format,fAuthor:x.author,fStatus:/lent|loan|borrow|out/i.test(x.status||"")?"Lent Out":"Available",fCover:coverFor(x)}))$(key).value=val||"";
 $("fKids").checked=isKids(x);$("delete").hidden=editing==null;$("modal").classList.add("open");$("fTitle").focus()}
 $("add").onclick=()=>edit(null);
 $("cancel").onclick=()=>$("modal").classList.remove("open");
@@ -189,6 +218,6 @@ $("random").onclick=()=>{const list=current();if(!list.length)return;const x=lis
 $("backup").onclick=()=>{const b=new Blob([JSON.stringify(items,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="Tales_Tables_Screens_Backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $("restore").onclick=()=>$("restoreFile").click();
 $("restoreFile").onchange=async e=>{try{const data=JSON.parse(await e.target.files[0].text());if(!Array.isArray(data))throw Error("not array");if(confirm("Replace the saved catalog on this device with the backup?")){items=data;persist();render()}}catch(e){alert("Could not open that JSON backup.")}e.target.value=""};
-["search","genre","status","sort"].forEach(id=>$(id).addEventListener(id==="search"?"input":"change",()=>{if(id==="search"){const list=current();$("summary").textContent=list.length+" matching items · "+items.length+" total";$("cards").innerHTML=list.map(x=>'<button class="item" data-id="'+esc(x.id)+'"><span class="cover"><span>'+esc(x.title)+'</span>'+(x.cover?'<img loading="lazy" src="'+esc(x.cover)+'" alt="" onerror="this.remove()">':"")+'</span><span class="label">'+esc(x.title)+'</span></button>').join("")||'<div class="empty">No matching items.</div>'}else render()}));
+["search","genre","status","sort"].forEach(id=>$(id).addEventListener(id==="search"?"input":"change",()=>{if(id==="search"){const list=current();$("summary").textContent=list.length+" matching items · "+items.length+" total";paintCards(list)}else render()}));
 render();
 </script></body></html>
