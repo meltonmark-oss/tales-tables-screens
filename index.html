@@ -137,6 +137,13 @@ body[data-tab="kids"] .actions button{color:#342314}
 .item:hover{filter:drop-shadow(5px 9px 5px #0007)!important}
 body[data-tab="kids"] .cover{background:linear-gradient(145deg,#ffe4a8,#e7a9c5)!important;color:#513c59}
 body[data-tab="movies"] .cover{background:linear-gradient(145deg,#437cdb,#153a8d)!important}
+
+/* Fix the full-shelf translucent layer obscuring covers on iOS Safari */
+.shelf{transform-style:flat!important;isolation:isolate!important}
+.shelf::before{display:none!important;content:none!important}
+.shelf::after{z-index:-1!important}
+.cards{z-index:5!important;transform:none!important}
+.item,.cover,.cover img{visibility:visible!important;opacity:1!important}
 </style></head>
 <body data-tab="books">
 <header><h1>Tales, Tables &amp; Screens, Oh My!</h1><p>Stories, Screens &amp; Shenanigans</p></header>
