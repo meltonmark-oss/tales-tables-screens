@@ -166,7 +166,8 @@ if(q)list=list.filter(x=>[x.title,x.genre,x.author,x.format].some(a=>String(a||"
 if(g)list=list.filter(x=>genreParts(x.genre).includes(g));
 if(st)list=list.filter(x=>st==="out"?/lent|loan|borrow|out/i.test(x.status||""):!/lent|loan|borrow|out/i.test(x.status||""));
 list.sort((a,b)=>String(a.title).localeCompare(String(b.title))*($("sort").value==="za"?-1:1));return list}
-function genreParts(value){return [...new Set(String(value||"").split(/\s*\/\s*|\s*[,;|&+]\s*|\s+and\s+/i).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/\s+/g," ")))]}\nfunction genres(){const prev=$("genre").value;const a=[...new Set(items.filter(x=>section(x)===tab).flatMap(x=>genreParts(x.genre)))].sort((a,b)=>a.localeCompare(b));$("genre").innerHTML='<option value="">All genres</option>'+a.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");$("genre").value=a.includes(prev)?prev:""}
+function genreParts(value){return [...new Set(String(value||"").split(/\s*\/\s*|\s*[,;|&+]\s*|\s+and\s+/i).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/\s+/g," ")))]} 
+function genres(){const prev=$("genre").value;const a=[...new Set(items.filter(x=>section(x)===tab).flatMap(x=>genreParts(x.genre)))].sort((a,b)=>a.localeCompare(b));$("genre").innerHTML='<option value="">All genres</option>'+a.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");$("genre").value=a.includes(prev)?prev:""}
 /* Artwork cache is separate from user edits, so existing local catalog data is preserved. */
 const ART_KEY="tts_artwork_v1";
 let artCache={};try{artCache=JSON.parse(localStorage.getItem(ART_KEY)||"{}")||{}}catch(e){}
