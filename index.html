@@ -47,6 +47,30 @@ body[data-tab="kids"] .label{text-shadow:none}body[data-tab="kids"] .item small{
 .panel h2{margin-top:0}.fields{display:grid;gap:10px}.fields label{display:grid;gap:4px;font-size:14px}.fields input,.fields select{width:100%;padding:10px;background:#fff;border:1px solid #b8a083;border-radius:5px;color:#231508}.panel .buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}.panel .buttons .danger{background:#f7c2b7}.panel .buttons .muted{background:#ebe4d6}
 footer{text-align:center;padding:24px;color:inherit;font-size:13px;opacity:.85}
 @media(max-width:570px){header{padding:19px 10px 14px}nav{gap:5px;padding:7px}nav button{padding:9px 8px;font-size:12px}main{padding:15px 9px 40px}.toolbar{padding:9px;gap:7px}.toolbar input{flex:1 1 100%}.toolbar select{flex:1 1 42%;font-size:13px;min-width:0}.shelf{padding:15px 9px;border-width:6px}.cards{grid-template-columns:repeat(auto-fill,minmax(99px,1fr));gap:17px 10px}.cover{font-size:11px}.item .label{font-size:12px}}
+
+/* Illustrated venue framing: decorative edges remain outside the collection */
+body{background-attachment:fixed;transition:background .25s}
+main{position:relative;isolation:isolate}
+main:before,main:after{content:"";position:absolute;top:16px;bottom:20px;width:clamp(16px,7vw,105px);z-index:-1;pointer-events:none;opacity:.9}
+main:before{left:0}main:after{right:0}
+body[data-tab="books"]{background:radial-gradient(ellipse at 50% 0%,#6b4124 0%,#211209 74%),repeating-linear-gradient(90deg,#261309 0 80px,#462710 82px 91px,#1b1009 94px 125px)}
+body[data-tab="books"] main:before,body[data-tab="books"] main:after{background:repeating-linear-gradient(0deg,#2e1a0d 0 7px,#916235 8px 12px,#211109 13px 190px),repeating-linear-gradient(90deg,#6e4123 0 12px,#2d180d 13px 29px,#a2733c 30px 34px);border:4px ridge #9c6a36;box-shadow:inset 0 0 30px #090400}
+body[data-tab="books"] .intro:before{content:"✦  THE GRAND LIBRARY  ✦";display:block;letter-spacing:.28em;color:#f4ca87;font-size:12px;margin-bottom:8px}
+body[data-tab="movies"]{background:repeating-linear-gradient(90deg,#001257 0 105px,#062a8a 105px 115px,#011950 116px 170px)}
+body[data-tab="movies"] main:before,body[data-tab="movies"] main:after{background:repeating-linear-gradient(0deg,#002276 0 55px,#ffd22a 55px 60px,#002276 61px 125px);border:5px solid #e5bc25;box-shadow:inset 0 0 23px #0008}
+body[data-tab="movies"] .intro:before{content:"★  NOW SHOWING  ★";display:block;background:#ffcf22;color:#07226d;font:900 13px system-ui,sans-serif;letter-spacing:.25em;padding:6px 22px;width:max-content;max-width:90%;margin:0 auto 10px;box-shadow:4px 4px #00114b}
+body[data-tab="movies"] .shelf{background:repeating-linear-gradient(0deg,#051d75 0 260px,#082879 261px 270px,#ffdc3e 271px 283px,#051553 284px 292px)}
+body[data-tab="games"]{background:radial-gradient(ellipse at 50% 0%,#5a4931,#1b211b 72%),repeating-linear-gradient(90deg,#303329 0 95px,#414638 96px 99px,#24291f 100px 180px)}
+body[data-tab="games"] main:before,body[data-tab="games"] main:after{background:repeating-linear-gradient(0deg,#383b31 0 45px,#20261f 46px 49px,#4a4b3a 50px 90px);border:7px ridge #95764b;box-shadow:inset 0 0 30px #080b08}
+body[data-tab="games"] .intro:before{content:"⚔  THE ADVENTURERS' GUILD  ⚔";display:block;letter-spacing:.16em;color:#d7bb76;font-size:13px;margin-bottom:8px}
+body[data-tab="games"] .intro:after{content:"⚜    ✧    ⚙    ✧    ⚜";display:block;color:#d6b26b;font-size:25px;margin-top:8px}
+body[data-tab="kids"]{background:radial-gradient(circle at 15% 10%,#fffae0 0 8%,transparent 24%),radial-gradient(circle at 85% 16%,#f4caed 0 12%,transparent 29%),linear-gradient(#b7dcd7,#f4e0f2 60%,#d3e7bd)}
+body[data-tab="kids"] main:before,body[data-tab="kids"] main:after{background:radial-gradient(circle at 50% 8%,#ffdf8c 0 10px,transparent 11px),repeating-linear-gradient(0deg,#8b674e 0 45px,#a8845b 46px 75px,#66875c 76px 120px);border:7px solid #a4b881;border-radius:60px 60px 10px 10px;box-shadow:0 0 22px #a3cfa7}
+body[data-tab="kids"] .intro:before{content:"✦  ✿  ✧  ✿  ✦";display:block;color:#a56abc;font-size:22px;margin-bottom:5px}
+body[data-tab="kids"] .intro:after{content:"☁    ✨    ☁";display:block;color:#ad77bb;font-size:20px;margin-top:5px}
+@media(min-width:1100px){main{padding-left:115px;padding-right:115px}}
+@media(max-width:700px){main:before,main:after{display:none}body[data-tab="books"] .intro:before,body[data-tab="games"] .intro:before{font-size:10px}}
+
 </style></head>
 <body data-tab="books">
 <header><h1>Tales, Tables &amp; Screens, Oh My!</h1><p>Stories, Screens &amp; Shenanigans</p></header>
