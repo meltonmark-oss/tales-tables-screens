@@ -102,6 +102,31 @@ body[data-tab="kids"] .item{filter:drop-shadow(4px 7px 5px #69446a66)}
 body[data-tab="kids"] .shelf:after{background:linear-gradient(#f9dcb7,#b98da7,#86658d)}
 @media(min-width:1100px){main:before,main:after{transform:perspective(450px) rotateY(9deg);transform-origin:left center;box-shadow:inset -18px 0 28px #0008,15px 20px 24px #0007}main:after{transform:perspective(450px) rotateY(-9deg);transform-origin:right center;box-shadow:inset 18px 0 28px #0008,-15px 20px 24px #0007}}
 @media(max-width:700px){.shelf{border-width:7px}.item:hover{transform:none}}
+
+/* Immersive illustrated rooms - replace former flat side murals */
+body[data-tab="books"],body[data-tab="movies"],body[data-tab="games"],body[data-tab="kids"]{background-color:#17110e;background-image:none}
+body[data-tab="books"]{--scene:url("art/books.svg");--trim:#9a6237;--glass:#24150de8}
+body[data-tab="movies"]{--scene:url("art/movies.svg");--trim:#f3ca35;--glass:#06164eea}
+body[data-tab="games"]{--scene:url("art/games.svg");--trim:#b89359;--glass:#26241fe9}
+body[data-tab="kids"]{--scene:url("art/kids.svg");--trim:#d5a2b3;--glass:#422c39e8}
+body:before{content:"";position:fixed;inset:0;z-index:-2;background-image:linear-gradient(90deg,#0009 0%,transparent 23%,transparent 77%,#0009 100%),var(--scene);background-size:cover,cover;background-position:center,center;background-repeat:no-repeat;pointer-events:none}
+body[data-tab="kids"]:before{filter:brightness(.8)}
+main:before,main:after{display:none!important}
+main{padding:25px 22px 70px!important;max-width:1130px}
+.intro{background:var(--glass)!important;border:2px solid var(--trim);border-radius:12px;padding:14px 16px!important;margin:5px auto 14px;max-width:900px;box-shadow:0 10px 24px #0008;filter:none!important}
+.intro h2{font-size:clamp(27px,4vw,42px);color:#fff0d1!important;text-shadow:2px 3px 5px #000!important}
+.intro p{color:#f5ddaf!important}
+.toolbar{background:var(--glass)!important;border:2px solid var(--trim)!important;box-shadow:0 10px 22px #0008}
+.actions{background:var(--glass);border-radius:12px;padding:10px;max-width:max-content;margin:10px auto 18px}
+.note{background:var(--glass);padding:9px 12px;border-radius:8px;color:#fff0d4!important}
+.shelf{background:linear-gradient(90deg,#0008,transparent 10%,transparent 90%,#0008),linear-gradient(180deg,#291c16ec,#38251de9)!important;border:12px ridge var(--trim)!important;box-shadow:inset 0 0 35px #000d,0 16px 35px #000b!important;border-radius:9px}
+body[data-tab="movies"] .shelf{background:linear-gradient(90deg,#00103ce8,#062679e8 40%,#00134be8)!important}
+body[data-tab="games"] .shelf{background:linear-gradient(90deg,#1d1b19ec,#4a3929e8 45%,#1b1a18ec)!important}
+body[data-tab="kids"] .shelf{background:linear-gradient(90deg,#4e2c3ce8,#79526be3 45%,#4c2a3ce8)!important}
+body[data-tab="kids"] .item .label{color:#fff6df;text-shadow:1px 2px 4px #000}
+body[data-tab="kids"] .intro:before,body[data-tab="kids"] .intro:after{color:#f6df98}
+body[data-tab="kids"] .actions button{color:#342314}
+@media(max-width:700px){body:before{background-size:cover,auto 100vh;background-position:center,center;opacity:.82}main{padding:12px 9px 45px!important}.shelf{border-width:6px!important}.intro{padding:10px!important}.actions{max-width:100%}}
 </style></head>
 <body data-tab="books">
 <header><h1>Tales, Tables &amp; Screens, Oh My!</h1><p>Stories, Screens &amp; Shenanigans</p></header>
