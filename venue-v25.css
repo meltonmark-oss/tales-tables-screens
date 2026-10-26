@@ -1,0 +1,118 @@
+/* v25 — Mobile usability, curated room finishing, compact controls */
+body[data-tab="books"] .intro{
+ border:2px solid #9b713f!important;border-radius:14px!important;
+ background:linear-gradient(90deg,#21140dda,#392316d9 50%,#21140dda)!important;
+ box-shadow:inset 0 0 0 3px #1c1008,inset 0 0 24px #a46b322e,0 8px 32px #000b!important
+}
+body[data-tab="books"] .intro h2{color:#fbd19b!important;text-shadow:0 2px 2px #1b0d05,0 0 20px #ed9e4b66!important}
+body[data-tab="games"] .intro{
+ border:4px ridge #997848!important;border-radius:12px!important;
+ box-shadow:inset 0 0 0 3px #1a130f,inset 0 0 24px #96734045,0 8px 32px #000b!important
+}
+body[data-tab="kids"] .intro{
+ border:3px solid #d7a9d4!important;
+ box-shadow:inset 0 0 0 2px #70436b,0 0 27px #dfb3f277,0 11px 26px #0008!important
+}
+body[data-tab="kids"] .intro h2{color:#ffe4c3!important}
+body[data-tab="movies"] .intro{
+ box-shadow:inset 0 0 0 3px #183482,0 0 25px #307eff8f,0 11px 30px #000c!important
+}
+.shelf{box-shadow:inset 0 0 20px #0007,0 14px 28px #000a,0 30px 65px #0008!important}
+.shelf>.cards{padding-bottom:4px}
+body[data-tab="movies"] .cover::before{content:"▣";font:900 32px Georgia,serif;color:#e5c955;opacity:.65}
+body[data-tab="games"] .cover::before{content:"⚄";font-size:30px;color:#dfc796;opacity:.84}
+body[data-tab="kids"] .cover::before{content:"✦";font-size:26px;color:#f8dca4}
+#filterToggle{
+ display:none;border-radius:7px;background:linear-gradient(#ead1a0,#bc915e);
+ color:#26190e;border:1px solid #e8cba0;min-height:39px;
+ font:700 13px Georgia,serif;padding:8px 12px;white-space:nowrap
+}
+#filterToggle[aria-expanded="true"]{background:linear-gradient(#f7dbaf,#e0bd7b);border-color:#ffdfaa}
+#filterToggle .filter-count{display:inline-block;margin-left:3px}
+.utility-drawer{position:relative;flex:0 0 auto;z-index:9}
+.utility-drawer summary{
+ list-style:none;cursor:pointer;display:flex;justify-content:center;align-items:center;
+ min-height:38px;background:linear-gradient(#372518,#1b1715);
+ color:#f2dfba;border:1px solid #a38152;border-radius:6px;
+ padding:8px 12px;font:600 12px Georgia,serif
+}
+.utility-drawer summary::-webkit-details-marker{display:none}
+.utility-drawer summary::after{content:"⌄";margin-left:7px;font-size:15px}
+.utility-drawer[open] summary::after{content:"⌃"}
+.utility-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:center;padding:9px}
+.utility-actions button{background:#eed6a6!important;color:#29190c!important}
+.utility-drawer[open]{width:100%;flex-basis:100%;background:#201811f0;border-radius:9px;border:1px solid #a68153}
+.utility-drawer[open] summary{max-width:160px;margin:7px auto 0}
+.toolbar:focus-within,.actions:focus-within{box-shadow:0 0 0 1px #edc885,0 6px 22px #0008!important}
+@media(max-width:700px){
+ .topbar{position:sticky!important;top:0!important;padding:5px 7px 8px!important;gap:4px!important;min-height:0!important;background:linear-gradient(180deg,#1c1210f8,#211615f8)!important}
+ .topbar header{flex:0 0 auto;padding:1px 0 0!important}
+ .topbar header h1{font-size:15px!important;white-space:nowrap}
+ .topbar nav{
+  width:100%!important;min-width:0!important;display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:5px!important;overflow:visible!important;justify-content:stretch!important;
+  margin:0!important;padding:1px 2px!important
+ }
+ .topbar nav button{
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  white-space:normal!important;overflow:visible!important;
+  padding:7px 6px!important;min-height:34px!important;
+  font-size:12px!important;line-height:1.18!important
+ }
+ body::before{opacity:1!important;filter:brightness(.96) saturate(1.16)!important}
+ main{padding:9px 8px 42px!important}
+ .intro{margin:2px auto 9px!important;padding:6px 8px 8px!important;border-radius:12px!important}
+ .intro h2{font-size:clamp(27px,8vw,39px)!important}
+ .intro p{font-size:12px!important}
+ .toolbar{
+  display:flex!important;flex-wrap:wrap!important;align-items:stretch!important;
+  padding:8px!important;gap:7px!important;margin:0 auto 9px!important
+ }
+ .toolbar #search{
+  flex:1 1 auto!important;width:calc(100% - 125px)!important;min-width:0!important;
+  min-height:41px!important
+ }
+ #filterToggle{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  flex:0 0 112px!important;width:112px;min-height:41px!important;
+  padding:6px!important;font-size:12px!important
+ }
+ .toolbar:not(.filters-open)>select,.toolbar:not(.filters-open)>#yearFilter{display:none!important}
+ .toolbar.filters-open>select,.toolbar.filters-open>#yearFilter{flex:1 1 45%!important}
+ .toolbar.filters-open>.book-filter[hidden]{display:none!important}
+ .actions{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  justify-content:stretch!important;align-items:stretch!important;
+  gap:6px!important;width:100%!important;max-width:100%!important;
+  margin:7px auto 11px!important;padding:7px!important
+ }
+ .actions>button{
+  min-width:0!important;min-height:43px!important;
+  font-size:10px!important;line-height:1.2!important;
+  white-space:normal!important;padding:5px 2px!important
+ }
+ .actions>.utility-drawer{min-width:0!important;width:100%!important}
+ .actions>.utility-drawer:not([open]){grid-column:auto!important}
+ .utility-drawer summary{
+  min-height:43px!important;width:100%!important;
+  padding:6px 3px!important;font-size:10px!important;line-height:1.15!important;
+  text-align:center;white-space:normal
+ }
+ .utility-drawer summary::after{margin-left:3px}
+ .actions>.utility-drawer[open]{grid-column:1/-1!important;grid-row:auto!important}
+ .utility-drawer[open] summary{max-width:150px}
+ .utility-actions{justify-content:center}
+ .utility-actions button{font-size:12px!important}
+ .note{margin:6px auto 10px!important;padding:6px 8px!important;font-size:11px!important}
+ .shelf{margin:5px auto!important}
+ .cards{row-gap:18px!important}
+ .cover{box-shadow:0 5px 8px #0008,inset 0 0 0 2px #ffffff1c!important}
+ .item .label{font-size:11px!important;line-height:1.25!important}
+}
+@media(max-width:365px){
+ .topbar nav button{font-size:11px!important;padding:7px 3px!important}
+ .actions>button,.utility-drawer summary{font-size:9.5px!important}
+ #filterToggle{flex-basis:99px!important;width:99px}
+ .toolbar #search{width:calc(100% - 110px)!important}
+}
