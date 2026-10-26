@@ -1,0 +1,149 @@
+
+/* Tales, Tables & Screens — immersive venue design v24 */
+:root{--ink:#fff0d1;--gold:#e6b66e;--gold-bright:#ffdf94}
+html{scroll-behavior:smooth}
+body{font-family:Georgia,"Palatino Linotype",serif}
+body::before{filter:contrast(1.08) saturate(1.14);opacity:1}
+.topbar{position:sticky;top:0;z-index:24;display:flex;align-items:center;gap:10px;width:100%;min-height:62px;padding:7px clamp(10px,2vw,30px);background:linear-gradient(180deg,#16100ff7,#20130fea);border-bottom:2px solid #b9874b;box-shadow:0 8px 35px #000d}
+.topbar header{flex:0 0 auto;position:static;min-width:0;padding:0 12px 0 0;background:none!important;border:0!important;box-shadow:none!important;text-align:left}
+.topbar h1{font-family:Georgia,serif;font-size:clamp(13px,1.5vw,19px);white-space:nowrap;color:#f8d39b!important;text-shadow:1px 2px 7px #000!important;font-weight:700}
+.topbar h1::before{content:"▣";display:inline-block;margin-right:8px;color:#fdd78d;font-size:1.3em;vertical-align:-.07em}
+.topbar header p{display:none}
+.topbar nav{position:static;flex:1 1 auto;display:flex;justify-content:center;gap:8px;flex-wrap:nowrap;padding:0;background:none!important;box-shadow:none!important;min-width:0}
+.topbar nav button{position:relative;flex:0 0 auto;background:linear-gradient(#33211b,#170d0c)!important;color:#e8d2ad!important;border:1px solid #79583d!important;border-radius:8px!important;padding:10px clamp(9px,1.3vw,17px)!important;font:600 clamp(11px,1.1vw,15px) Georgia,serif!important;white-space:nowrap;min-height:42px;box-shadow:inset 0 1px #fff1,0 3px 8px #0008}
+.topbar nav button[data-go="books"]{--tab-glow:#ffbf63;--tab-border:#c7934f}
+.topbar nav button[data-go="movies"]{--tab-glow:#73b5ff;--tab-border:#347ccc}
+.topbar nav button[data-go="games"]{--tab-glow:#99dfba;--tab-border:#4da279}
+.topbar nav button[data-go="kids"]{--tab-glow:#f2aaff;--tab-border:#9f6fc1}
+.topbar nav button[aria-selected="true"]{color:var(--tab-glow)!important;border:1.5px solid var(--tab-border)!important;background:linear-gradient(180deg,#33211b,#160e0a)!important;box-shadow:0 0 0 1px #ffdca12b,inset 0 0 11px #ffffff0c,0 0 17px var(--tab-border)!important}
+.topbar nav button:focus-visible,.topbar button:focus-visible{outline:2px solid #ffe0a1;outline-offset:2px}
+.top-actions{display:flex;align-items:center;gap:6px}
+.top-actions button{font:600 12px Georgia,serif;white-space:nowrap;background:#100d12;color:#f2dbb1;border:1px solid #574435;border-radius:7px;padding:11px 12px;min-height:42px}
+.top-actions button:hover{background:#3e2a20}
+main{max-width:1260px!important;margin:auto;padding:20px clamp(12px,3vw,36px) 70px!important}
+.intro{position:relative;max-width:990px;margin:5px auto 16px!important;padding:19px 14px 13px!important;border:0!important;background:radial-gradient(ellipse at center,#281c16d9 0%,#160e0cb8 80%)!important;box-shadow:0 0 50px #0008,0 2px 35px #0008!important;border-radius:24px}
+.intro h2{font-size:clamp(35px,5.2vw,66px)!important;line-height:1.04;letter-spacing:.02em;color:#ffdaa0!important;text-shadow:0 3px #241005,0 0 15px #d47b3780,2px 6px 9px #000!important}
+.intro p{font:500 clamp(13px,1.8vw,18px) Georgia,serif!important;color:#fff0c9!important;letter-spacing:.03em}
+.intro::before{content:"✦  ❧  ✦";display:block;color:#ffd28b;font-size:18px;letter-spacing:12px;text-shadow:0 0 11px #da9d4a;margin:0 auto 4px}
+.intro::after{content:"❦";display:block;font-size:20px;color:#ffd28b;text-shadow:0 0 10px #e5ab5e}
+body[data-tab="books"] .intro:before,body[data-tab="books"] .intro:after,
+body[data-tab="kids"] .intro:before,body[data-tab="kids"] .intro:after,
+body[data-tab="games"] .intro:before,body[data-tab="games"] .intro:after{content:"✦  ❧  ✦";font-size:18px;letter-spacing:12px}
+body[data-tab="movies"] .intro{border:3px solid #e9c13d!important;border-radius:8px!important;max-width:920px;box-shadow:inset 0 0 0 2px #1c76dc,0 0 24px #3383f3b0!important;background:linear-gradient(#041342e3,#001247db)!important}
+body[data-tab="movies"] .intro h2{font-family:Georgia,serif;color:#ffe34d!important;text-shadow:2px 4px #000b,0 0 12px #efbe57!important}
+body[data-tab="movies"] .intro::before{content:"✦  NOW SHOWING  ✦"!important;display:block!important;font:bold 11px system-ui!important;letter-spacing:.22em!important;color:#0f2453!important;background:#ffe13c!important;width:max-content;max-width:95%;margin:0 auto 7px;padding:4px 16px;border-radius:4px}
+body[data-tab="movies"] .intro::after{content:"★  ★  ★  ★  ★"!important;font-size:13px!important;letter-spacing:.2em!important;color:#ffde49!important}
+body[data-tab="games"] .intro{background:radial-gradient(ellipse at center,#44311dd9,#1d1a16d5)!important;outline:2px solid #b89253;outline-offset:-6px}
+body[data-tab="kids"] .intro{background:radial-gradient(ellipse,#49315acc,#27152bd4)!important;border:3px solid #b993c2!important;box-shadow:0 0 16px #e6b5e96a!important}
+body[data-tab="kids"] .intro h2{color:#ffe8c7!important;text-shadow:0 0 9px #eaaeef,2px 4px #44215f!important}
+.toolbar{max-width:1110px;margin:0 auto 10px!important;padding:9px 13px!important;gap:8px!important;border:1.5px solid #b08a54!important;border-radius:9px!important;background:#160e0de9!important;box-shadow:0 8px 20px #0009,inset 0 1px #fff2!important}
+.toolbar input,.toolbar select{flex:1 1 auto;min-width:90px;background:linear-gradient(#fff9ef,#ede4d7)!important;color:#261a18!important;border:1px solid #ab9683!important;border-radius:6px!important;padding:9px!important;min-height:39px!important;font:500 13px Georgia,serif!important}
+.toolbar #search{flex:2.2 1 190px}
+.toolbar #yearFilter{flex:1 1 100px}
+.toolbar input::placeholder{color:#6a5b4d}
+.actions{max-width:100%;gap:8px!important;padding:7px!important;background:#120f10e6!important;border:1px solid #765736;border-radius:8px;box-shadow:0 5px 14px #0009}
+.actions button{font:600 12px Georgia,serif!important;color:#f2dfba!important;background:linear-gradient(#372518,#1b1715)!important;border:1px solid #a38152!important;border-radius:6px!important;padding:8px 12px!important;min-height:38px!important}
+.actions button:hover{background:#654526!important}
+.note{max-width:1000px;background:#140f0cde!important;color:#f0dabb!important;border:1px solid #6e4a2e;border-radius:7px;padding:6px 14px!important;font-size:12px!important}
+.shelf{--beam:278px;position:relative;max-width:1150px;margin:0 auto!important;isolation:isolate!important;transform-style:flat!important;border:11px ridge #ae7a40!important;border-radius:5px!important;padding:19px 17px 36px!important;background:linear-gradient(90deg,#0007,transparent 6%,transparent 92%,#0008),repeating-linear-gradient(180deg,#24140e 0px,#3d2415 246px,#704019 257px,#cb9652 263px,#563016 273px,#130c09 284px)!important;box-shadow:inset 0 0 28px #0008,0 10px 25px #000a,0 32px 65px #0008!important}
+.shelf::before{display:block!important;content:""!important;position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#0005,transparent 8%,transparent 92%,#0005)!important;z-index:0!important}
+.shelf::after{content:""!important;display:block!important;position:absolute;left:-8px;right:-8px;bottom:-16px;height:17px;background:linear-gradient(#c68d4f,#5c341a 55%,#20100c);box-shadow:0 10px 14px #000b;z-index:0!important;transform:none!important}
+.cards{position:relative;z-index:2!important;display:grid;grid-template-columns:repeat(auto-fill,minmax(133px,1fr));gap:34px 16px;grid-auto-flow:row;align-items:start;perspective:none}
+.item{position:relative;z-index:3!important;color:#fff0ce!important;transition:transform .18s,filter .18s;display:flex;flex-direction:column;align-items:center;align-self:start;padding:4px 2px 9px!important;filter:drop-shadow(4px 6px 3px #0009)!important}
+.item:hover{transform:translateY(-7px) scale(1.035)}
+.cover{position:relative;width:100%;max-width:160px;aspect-ratio:2/3;transform:none!important;border:3px solid #ba925e!important;border-radius:3px!important;display:flex;flex-direction:column;justify-content:center;gap:12px;align-items:center;padding:14px 11px!important;background:radial-gradient(circle at 60% 25%,#b67d5980,transparent 60%),linear-gradient(140deg,#523d65,#1b263f)!important;box-shadow:inset 6px 0 10px #0005,inset 0 0 0 3px #fff1,6px 7px 11px #000a!important;font-size:14px!important;line-height:1.28!important;overflow:hidden}
+.cover::before{content:"❦";font-size:24px;color:#dfc997;opacity:.8;text-shadow:0 0 6px #000;z-index:0}
+.cover::after{content:"";pointer-events:none;position:absolute;inset:7px;border:1px solid #f1dcb55c;z-index:1}
+.cover>span{position:relative;z-index:1;text-shadow:0 1px 4px #000;line-height:1.3}
+.cover img{position:absolute!important;inset:0;z-index:3;width:100%;height:100%;object-fit:cover;border:0;box-shadow:none!important;filter:none!important}
+.item .label{font:600 12px/1.2 Georgia,serif;text-align:center;color:#fff3d5;min-height:28px;max-width:175px;margin-top:8px!important;text-shadow:1px 2px 4px #000d!important}
+.item small{font-size:11px!important;margin-top:4px}
+.item:nth-child(6n+2) .cover{background:radial-gradient(circle at 50% 25%,#bf906890,transparent 60%),linear-gradient(130deg,#4e2027,#22142b)!important}
+.item:nth-child(6n+3) .cover{background:radial-gradient(circle at 50% 25%,#cdad7099,transparent 60%),linear-gradient(130deg,#2b5061,#17283b)!important}
+.item:nth-child(6n+4) .cover{background:radial-gradient(circle at 50% 25%,#ce9a5180,transparent 60%),linear-gradient(130deg,#624119,#222015)!important}
+.item:nth-child(6n+5) .cover{background:radial-gradient(circle at 50% 25%,#b2a0ac80,transparent 60%),linear-gradient(130deg,#44496b,#201b31)!important}
+.item:nth-child(6n+6) .cover{background:radial-gradient(circle at 50% 25%,#8ea67690,transparent 60%),linear-gradient(130deg,#275245,#17241e)!important}
+body[data-tab="movies"] .shelf{border-color:#e8c737!important;background:linear-gradient(90deg,#0008,transparent 7%,transparent 93%,#0008),repeating-linear-gradient(180deg,#03134f 0px,#103080 248px,#143db8 257px,#ffdf4b 262px,#bc8815 276px,#041043 284px)!important}
+body[data-tab="movies"] .cover{border-color:#f3cb36!important}
+body[data-tab="movies"] .item .label{color:#fff1b7}
+body[data-tab="games"] .shelf{border-color:#a58a5d!important;background:linear-gradient(90deg,#0008,transparent 7%,transparent 93%,#0008),repeating-linear-gradient(180deg,#27251d 0px,#4b3d2c 248px,#886944 257px,#c09c5e 262px,#5a4328 276px,#24231c 284px)!important}
+body[data-tab="games"] .cover{border-color:#b5a16f!important}
+body[data-tab="kids"] .shelf{border-color:#cf9bb8!important;background:linear-gradient(90deg,#0005,transparent 7%,transparent 93%,#0005),repeating-linear-gradient(180deg,#4e2f4f 0px,#845b80 248px,#9a7996 257px,#f1c49b 262px,#ae819d 276px,#4b2e4d 284px)!important}
+body[data-tab="kids"] .cover{border-color:#f1cca3!important}
+body[data-tab="kids"] .cover::before{content:"✧"}
+body[data-tab="kids"] .item .label{color:#fff4da!important;text-shadow:0 1px 4px #2c1836!important}
+body[data-tab="books"]{--scene:url("art/books.svg")}
+body[data-tab="movies"]{--scene:url("art/movies.svg")}
+body[data-tab="games"]{--scene:url("art/games.svg")}
+body[data-tab="kids"]{--scene:url("art/kids.svg")}
+body[data-tab="movies"] .topbar{border-bottom-color:#c7a740}
+body[data-tab="games"] .topbar{border-bottom-color:#8d794e}
+body[data-tab="kids"] .topbar{border-bottom-color:#9f7299}
+.game-night[hidden],.game-field[hidden]{display:none!important}
+.game-night{max-width:1150px;margin:15px auto 20px;border:7px ridge #a4834d;border-radius:12px;background:radial-gradient(circle at 50% 0,#4d3827e8,#201a15f5 70%);box-shadow:inset 0 0 38px #0008,0 15px 30px #000b;padding:20px clamp(12px,3vw,26px);color:#ffe6ba}
+.gn-top{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:space-between;padding:0 0 10px;border-bottom:1px solid #c9a66a60}
+.gn-top h3{margin:0;font-size:clamp(24px,3vw,35px);color:#ffcf78;text-shadow:0 2px 3px #000,0 0 12px #f9b34e59}
+.gn-top p{margin:5px 0 0;color:#e7d0aa;font-size:13px}
+.gn-dice{font-size:30px;filter:drop-shadow(0 3px 4px #000)}
+.gn-controls{display:grid;grid-template-columns:minmax(90px,.7fr) minmax(130px,1fr) minmax(145px,1fr) auto;gap:10px;align-items:end;padding:16px 0}
+.gn-controls label{display:flex;flex-direction:column;gap:6px;color:#fbe5c5;font:600 13px Georgia,serif}
+.gn-controls select{width:100%;min-height:43px;border-radius:7px;padding:9px;background:#fff1d4;border:1px solid #a78859;color:#24180f}
+.gn-controls button,.gn-button{padding:10px 17px!important;min-height:43px!important;background:linear-gradient(#fbe3a5,#cc9441)!important;color:#231709!important;border:1px solid #f4d593!important;border-radius:7px!important;font:700 14px Georgia,serif!important;box-shadow:0 4px 8px #0007}
+.gn-controls button:hover,.gn-button:hover{filter:brightness(1.08)}
+.gn-note{font-size:12px;color:#e4c99c;margin:3px 0 7px}
+.gn-results{margin-top:8px}
+.gn-results:empty{display:none}
+.gn-plan-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:12px 0 10px}
+.gn-plan-head h4{margin:0;font-size:20px;color:#ffe1a0}
+.gn-game-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.gn-game{background:linear-gradient(160deg,#503624ef,#2b2119ee);border:1px solid #ab8451;border-radius:8px;padding:13px;box-shadow:inset 0 1px #fff2,0 4px 10px #0007}
+.gn-game .gn-count{color:#e2b579;font-size:11px;text-transform:uppercase;letter-spacing:.14em}
+.gn-game .gn-title{font-size:18px;line-height:1.2;margin:7px 0;color:#fff1cb}
+.gn-game .gn-detail{font-size:12px;color:#dbc69f;margin:0 0 9px}
+.gn-game button{min-height:32px;padding:6px 10px;border:1px solid #b18a58;color:#f3dcac;background:#251a15;border-radius:5px;font:600 12px Georgia,serif}
+.gn-alts{margin:12px 0 0;font-size:12px;color:#e5cb9e;line-height:1.5}
+.gn-alert{background:#292017;border:1px solid #ad834b;padding:13px;border-radius:7px}
+.panel{border:3px ridge #a9885b;box-shadow:0 20px 75px #000d}
+.panel .fields input,.panel .fields select{font-size:16px}
+@media(min-width:1500px){.topbar{padding-left:5vw;padding-right:5vw}}
+@media(max-width:1100px){.top-actions{display:none}.topbar header h1{font-size:14px}main{padding:13px 14px 50px!important}}
+@media(max-width:700px){
+ .topbar{display:flex;flex-direction:column;gap:0;padding:5px 4px 6px;min-height:85px;align-items:stretch}
+ .topbar header{padding:0;text-align:center}
+ .topbar header h1{font-size:14px;letter-spacing:.04em}
+ .topbar nav{width:100%;overflow-x:auto;scrollbar-width:none;justify-content:space-between;gap:4px;padding:4px 5px}
+ .topbar nav::-webkit-scrollbar{display:none}
+ .topbar nav button{font-size:11px!important;padding:9px 7px!important;min-height:35px!important}
+ body:before{background-size:cover,auto 100vh!important;background-position:center,center!important;opacity:.92!important}
+ main{padding:8px 8px 50px!important}
+ .intro{padding:8px 8px 6px!important;margin:4px auto 8px!important}
+ .intro h2{font-size:clamp(29px,8vw,43px)!important}
+ .intro p{font-size:12px!important;margin-top:3px!important}
+ .intro:before{font-size:11px!important;letter-spacing:5px!important;margin-bottom:2px!important}
+ .intro:after{font-size:12px!important}
+ .toolbar{padding:7px!important;gap:6px!important}
+ .toolbar #search{flex:1 1 100%}
+ .toolbar input,.toolbar select{flex:1 1 44%!important;min-width:0!important;font-size:12px!important;min-height:38px!important;padding:7px!important}
+ .actions{gap:6px!important;flex-wrap:wrap}
+ .actions button{font-size:11px!important;padding:7px 9px!important;min-height:36px!important}
+ .shelf{border-width:7px!important;padding:11px 7px 24px!important;background:linear-gradient(90deg,#0005,transparent 8%,transparent 92%,#0005),repeating-linear-gradient(180deg,#23140f 0,#483025 176px,#be884c 181px,#58331b 194px,#24160f 201px)!important}
+ body[data-tab="movies"] .shelf{background:linear-gradient(90deg,#0008,transparent 7%,transparent 93%,#0008),repeating-linear-gradient(180deg,#081452 0,#173888 176px,#ffe45d 181px,#9f7a25 194px,#111b52 201px)!important}
+ body[data-tab="games"] .shelf{background:linear-gradient(90deg,#0008,transparent 7%,transparent 93%,#0008),repeating-linear-gradient(180deg,#2f271f 0,#4f4230 176px,#bb9a67 181px,#6d4c2b 194px,#261e18 201px)!important}
+ body[data-tab="kids"] .shelf{background:linear-gradient(90deg,#0007,transparent 7%,transparent 93%,#0007),repeating-linear-gradient(180deg,#49304b 0,#866484 176px,#edc1ae 181px,#ac8198 194px,#49304a 201px)!important}
+ .cards{grid-template-columns:repeat(3,minmax(0,1fr));column-gap:9px;row-gap:20px}
+ .item{padding:2px 1px 7px!important}
+ .cover{max-width:100%;font-size:11px!important;border-width:2px!important;padding:7px!important}
+ .cover::after{inset:4px}
+ .cover::before{font-size:18px}
+ .item .label{font-size:11px!important;min-height:28px;margin-top:5px!important}
+ .game-night{padding:14px 10px;margin:10px auto 15px;border-width:5px}
+ .gn-controls{grid-template-columns:1fr 1fr;gap:9px}
+ .gn-controls label:last-of-type{grid-column:1/3}
+ .gn-controls button{grid-column:1/3}
+ .gn-game-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .gn-game{padding:10px}
+ .gn-game .gn-title{font-size:15px}
+ .gn-game .gn-detail{font-size:11px}
+}
+@media(max-width:360px){.topbar nav button{font-size:10px!important;padding:8px 5px!important}.cards{gap:18px 6px}.cover{font-size:10px!important}.gn-game-list{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.item,.topbar button{transition:none!important}}
