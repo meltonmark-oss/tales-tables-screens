@@ -17,9 +17,9 @@ const urlOK=s=>/^https:\/\//i.test(String(s||""));
 const key=x=>String(x.type||"Movie")+"|"+String(x.title||"").toLowerCase().trim();
 const existingPoster=x=>{
  if(x.cover&&urlOK(x.cover))return x.cover;
- const byTitle=window.VERIFIED_POSTERS?.[key(x)];
+ const byTitle=(typeof VERIFIED_POSTERS!=="undefined"?VERIFIED_POSTERS[key(x)]:"");
  if(byTitle&&urlOK(byTitle))return byTitle;
- const saved=window.artCache?.[String(x.type||"Movie")+"|"+String(x.title||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()];
+ const saved=(typeof artCache!=="undefined"?artCache[String(x.type||"Movie")+"|"+String(x.title||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()]:null);
  return typeof saved==="string"?saved:(saved?.url||"");
 };
 const resultCache=new Map();
@@ -126,6 +126,17 @@ async function enrichOpenEditor(){
  msg.innerHTML='<p style="margin:5px 0">Poster found for '+escapeHtml(originalTitle)+'. Check it, then tap Save item.</p><img src="'+escapeHtml(url)+'" alt="Suggested movie poster" style="max-width:135px;max-height:190px;object-fit:contain;background:#fff;border:1px solid #bca387;border-radius:4px">';
 }
 function escapeHtml(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+window.enrichSavedMovie=async function(id){
+ const record=typeof items!=="undefined"?items.find(x=>String(x.id)===String(id)):null;
+ if(!record||record.type!=="Movie"||record.cover)return;
+ const name=record.title,url=await getPoster({type:"Movie",title:name,year:record.year,barcode:record.barcode});
+ if(!url)return;
+ const current=items.find(x=>String(x.id)===String(id));
+ if(!current||current.type!=="Movie"||current.cover||current.title!==name)return;
+ current.cover=url;
+ if(typeof persist==="function")persist();
+ if(typeof render==="function")render();
+};
 window.movieCoverLookup=getPoster;
 window.autoMovieCover=enrichOpenEditor;
 })();
