@@ -172,7 +172,7 @@ window.enrichSavedMovie=async function(id){
  const rec=typeof items!=="undefined"?items.find(x=>String(x.id)===String(id)):null;
  if(!rec||rec.type!=="Movie")return;
  const before={name:rec.title,cover:rec.cover,genre:rec.genre,year:rec.year};
- const data=await lookup({type:"Movie",title:before.name,cover:before.cover||"",year:before.year});
+ const data=await lookup({type:"Movie",title:before.name,cover:before.cover||"",year:before.year,barcode:rec.barcode});
  if(!data)return;
  const current=items.find(x=>String(x.id)===String(id));
  if(!current||current.title!==before.name||current.type!=="Movie")return;
