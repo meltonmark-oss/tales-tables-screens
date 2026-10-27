@@ -1,4 +1,4 @@
-/* Automatic movie cover enrichment (v30)
+/* Automatic movie cover enrichment (v31)
    Finds art by exact movie/series title, validates that it loads, and places the
    verified image in the edit form. No key, user account, or server required.
    Multi-film collections are intentionally handled as whole products only.
@@ -133,7 +133,9 @@ async function enrichOpenEditor(){
  const token=++requestToken,originalTitle=titleField.value.trim(),initialUrl=coverInput.value.trim();
  const item={type:"Movie",title:originalTitle,year:Number($("fYear")?.value)||null,cover:""};
  const liveRecord=typeof items!=="undefined"?items.find(x=>x.type==="Movie"&&nameKey(x.title)===nameKey(originalTitle)):null;
- if(liveRecord?.cover){msg.textContent="Existing custom cover preserved.";return}
+ /* A stored cover URL might be broken and excluded from the visible shelf.
+    Validate what is actually in the editor rather than treating any saved URL
+    as proof that we have usable artwork. */
  msg.textContent="Checking poster artwork for “"+originalTitle+"”…";
  if(initialUrl&&await imageWorks(initialUrl,3500)){
   if(token===requestToken)msg.textContent="Cover link is ready. Tap Save item to store it.";
@@ -153,11 +155,13 @@ async function enrichOpenEditor(){
 function escapeHtml(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 window.enrichSavedMovie=async function(id){
  const record=typeof items!=="undefined"?items.find(x=>String(x.id)===String(id)):null;
- if(!record||record.type!=="Movie"||record.cover)return;
+ if(!record||record.type!=="Movie")return;
+ if(record.cover&&await imageWorks(record.cover,3200))return;
  const name=record.title,url=await getPoster({type:"Movie",title:name,year:record.year,barcode:record.barcode});
  if(!url)return;
  const current=items.find(x=>String(x.id)===String(id));
- if(!current||current.type!=="Movie"||current.cover||current.title!==name)return;
+ if(!current||current.type!=="Movie"||current.title!==name)return;
+ if(current.cover&&current.cover!==record.cover)return; /* respect a new manual edit */
  current.cover=url;
  if(typeof persist==="function")persist();
  if(typeof render==="function")render();
