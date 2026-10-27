@@ -6,6 +6,8 @@
 "use strict";
 const byId=id=>document.getElementById(id);
 const status=(message)=>{byId("scanStatus").textContent=message};
+function scanWantsBook(){const kind=typeof window.scanIntoItemCategory==="function"?window.scanIntoItemCategory():null;return kind?kind==="Book":(tab==="books"||tab==="kids")}
+
 let booting=false,watchdog=null,loadPending=null,activeReader=null,runId=0;
 function cancelWatchdog(){if(watchdog){clearTimeout(watchdog);watchdog=null}}
 function stopAll(){runId++;cancelWatchdog();stopCamera();try{activeReader?.reset?.()}catch(e){}activeReader=null;booting=false}
@@ -79,7 +81,7 @@ function makePhotoCanvas(image,region,opts={}){
 }
 function validReading(raw){
  const code=String(raw||"").replace(/\D/g,"");
- if(tab==="books"||tab==="kids")return code.length===13&&/^97[89]/.test(code)&&validEAN13(code);
+ if(scanWantsBook())return code.length===13&&/^97[89]/.test(code)&&validEAN13(code);
  return validUPC(code)||(code.length===13&&validEAN13(code));
 }
 async function photoCandidates(file,token){
@@ -111,7 +113,7 @@ async function photoCandidates(file,token){
     try{
      const result=reader.decodeFromCanvas(c),raw=result.getText();
      if(validReading(raw))return {raw,format:String(result.getBarcodeFormat?.()||"")};
-     lastError=new Error("Detected a code ("+raw+") but not a valid "+(tab==="books"||tab==="kids"?"ISBN":"UPC"));
+     lastError=new Error("Detected a code ("+raw+") but not a valid "+(scanWantsBook()?"ISBN":"UPC"));
     }catch(e){lastError=e}
     finally{c.width=0;c.height=0}
    }
@@ -124,7 +126,7 @@ async function photoCandidates(file,token){
    catch(e){lastError=e}
    finally{c.width=0;c.height=0}
   }
-  throw new Error("No readable "+(tab==="books"||tab==="kids"?"ISBN":"UPC")+" found in this photo");
+  throw new Error("No readable "+(scanWantsBook()?"ISBN":"UPC")+" found in this photo");
  }finally{try{reader.reset?.()}catch(e){}}
 }
 async function scanPhoto(file){
@@ -166,13 +168,13 @@ async function startCamera(){
   if(!iphone&&"BarcodeDetector" in window){
    try{
     const formats=await BarcodeDetector.getSupportedFormats();
-    const wanted=(tab==="books"||tab==="kids"?["ean_13"]:["upc_a","ean_13"]).filter(x=>formats.includes(x));
+    const wanted=(scanWantsBook()?["ean_13"]:["upc_a","ean_13"]).filter(x=>formats.includes(x));
     if(wanted.length){
      const detector=new BarcodeDetector({formats:wanted});
      cameraStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}}});
      if(id!==runId){cameraStream?.getTracks().forEach(x=>x.stop());return}
      video.srcObject=cameraStream;await video.play();scanActive=true;
-     status("Camera running · Reading "+(tab==="books"||tab==="kids"?"ISBN":"UPC")+" barcodes…");
+     status("Camera running · Reading "+(scanWantsBook()?"ISBN":"UPC")+" barcodes…");
      let busy=false;
      scanTimer=setInterval(async()=>{if(!scanActive||busy||video.readyState<2)return;busy=true;
        try{const found=await detector.detect(video);if(found.length)for(const x of found){capturedBarcode(x.rawValue,x.format);if(!scanActive)break}}catch(e){}finally{busy=false}
@@ -194,12 +196,12 @@ async function startCamera(){
     if(id!==runId||!scanActive)return;
     if(result){capturedBarcode(result.getText(),String(result.getBarcodeFormat?.()||""));cancelWatchdog();return}
     attempts++;
-    if(attempts===55)status("Camera running · Searching for "+(tab==="books"||tab==="kids"?"a 13-digit ISBN":"a valid UPC")+". Move slightly closer and avoid reflections.");
+    if(attempts===55)status("Camera running · Searching for "+(scanWantsBook()?"a 13-digit ISBN":"a valid UPC")+". Move slightly closer and avoid reflections.");
    }
   );
   if(id!==runId||!scanActive){controls?.stop?.();return}
   cameraControls=controls;
-  status("Camera running · Reading "+(tab==="books"||tab==="kids"?"ISBN":"UPC")+" barcodes…");
+  status("Camera running · Reading "+(scanWantsBook()?"ISBN":"UPC")+" barcodes…");
   watchdog=setTimeout(()=>{if(scanActive)status("Camera is on, but no barcode was recognized after 15 seconds. Try Scan from photo, or enter the number manually.")},15000);
  }catch(e){
   if(id===runId){stopAll();status("Camera scanner error: "+(e.message||String(e))+". You can use Scan from photo or type the code.");}
