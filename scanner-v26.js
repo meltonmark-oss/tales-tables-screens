@@ -35,39 +35,123 @@ async function ensureReader(){
  })().finally(()=>{loadPending=null});
  return loadPending;
 }
-function photoUnsupported(){
- status("This device could not decode the photo. Type the printed ISBN or UPC instead, or take a sharper photo with the bars filling the frame.");
+
+function photoUnsupported(reason){
+ const detail=reason?.message?String(reason.message):String(reason||"No barcode detected");
+ const shortened=detail.length>130?detail.slice(0,130)+"…":detail;
+ status("Photo scan: "+shortened+". Try a sharper, closer picture with all barcode bars visible, or type the printed number.");
+}
+/* Canvas scanning is more reliable than scanning an entire iPhone photo: try
+   several barcode-sized regions at different orientations and contrast. */
+async function imageFromFile(file){
+ const url=URL.createObjectURL(file);
+ try{
+  const img=await new Promise((resolve,reject)=>{
+   const im=new Image();
+   const wait=setTimeout(()=>reject(new Error("Photo did not finish loading")),12000);
+   im.onload=()=>{clearTimeout(wait);resolve(im)};
+   im.onerror=()=>{clearTimeout(wait);reject(new Error("iPhone photo format not supported here; try a JPEG screenshot"))};
+   im.src=url;
+  });
+  return img;
+ }finally{ /* URL is kept through the async image loading; safe to revoke after load */
+  URL.revokeObjectURL(url);
+ }
+}
+function makePhotoCanvas(image,region,opts={}){
+ const nw=image.naturalWidth||image.width,nh=image.naturalHeight||image.height;
+ const sx=Math.max(0,Math.floor(region[0]*nw)),sy=Math.max(0,Math.floor(region[1]*nh));
+ const sw=Math.max(1,Math.min(nw-sx,Math.floor(region[2]*nw)));
+ const sh=Math.max(1,Math.min(nh-sy,Math.floor(region[3]*nh)));
+ const rotate=!!opts.rotate;
+ const scale=Math.min(2,2200/Math.max(sw,sh));
+ const w=Math.max(1,Math.floor(sw*scale)),h=Math.max(1,Math.floor(sh*scale));
+ const c=document.createElement("canvas");
+ c.width=rotate?h:w;c.height=rotate?w:h;
+ const ctx=c.getContext("2d",{willReadFrequently:true})||c.getContext("2d");
+ if(!ctx)throw new Error("Could not prepare photo for reading");
+ ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
+ if(opts.highContrast&&"filter" in ctx)ctx.filter="grayscale(1) contrast(1.65)";
+ if(rotate){ctx.translate(c.width,0);ctx.rotate(Math.PI/2)}
+ ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+ ctx.drawImage(image,sx,sy,sw,sh,0,0,w,h);
+ return c;
+}
+function validReading(raw){
+ const code=String(raw||"").replace(/\D/g,"");
+ if(tab==="books"||tab==="kids")return code.length===13&&/^97[89]/.test(code)&&validEAN13(code);
+ return validUPC(code)||(code.length===13&&validEAN13(code));
+}
+async function photoCandidates(file,token){
+ const image=await imageFromFile(file);
+ if(token!==runId)return null;
+ const lib=await ensureReader();
+ const reader=new lib.BrowserMultiFormatReader();
+ try{
+  const regions=[
+   [0,0,1,1],
+   [.13,.10,.74,.8],
+   [0,0,1,.55],[0,.45,1,.55],
+   [0,0,.6,1],[.4,0,.6,1],
+   [0,0,.65,.58],[.35,0,.65,.58],
+   [0,.42,.65,.58],[.35,.42,.65,.58],
+   [.18,.18,.64,.64],
+   [0,.22,1,.55],[.22,0,.56,1]
+  ];
+  let lastError=null,attempt=0;
+  for(const region of regions){
+   for(const opts of [{}, {highContrast:true}]){
+    if(token!==runId)return null;
+    attempt++;
+    if(attempt===1||attempt%5===0){
+      status("Reading photo… trying region "+attempt+" of "+(regions.length*2));
+      await new Promise(resolve=>setTimeout(resolve,0));
+    }
+    const c=makePhotoCanvas(image,region,opts);
+    try{
+     const result=reader.decodeFromCanvas(c),raw=result.getText();
+     if(validReading(raw))return {raw,format:String(result.getBarcodeFormat?.()||"")};
+     lastError=new Error("Detected a code ("+raw+") but not a valid "+(tab==="books"||tab==="kids"?"ISBN":"UPC"));
+    }catch(e){lastError=e}
+    finally{c.width=0;c.height=0}
+   }
+  }
+  /* Camera photos occasionally have rotated barcodes. Try turning all or center once. */
+  for(const region of [[0,0,1,1],[.1,.1,.8,.8]]){
+   if(token!==runId)return null;
+   const c=makePhotoCanvas(image,region,{rotate:true});
+   try{const result=reader.decodeFromCanvas(c);if(validReading(result.getText()))return {raw:result.getText(),format:String(result.getBarcodeFormat?.()||"")}}
+   catch(e){lastError=e}
+   finally{c.width=0;c.height=0}
+  }
+  throw new Error("No readable "+(tab==="books"||tab==="kids"?"ISBN":"UPC")+" found in this photo");
+ }finally{try{reader.reset?.()}catch(e){}}
 }
 async function scanPhoto(file){
  if(!file)return;
- stopAll();
- const id=runId;
- booting=true;
- status("Reading the barcode from your photo…");
+ stopAll();const token=runId;
+ booting=true;status("Preparing your photo for barcode recognition…");
  try{
-  let raw="",format="";
+  let match=null;
   if("BarcodeDetector" in window){
    try{
     const supported=await BarcodeDetector.getSupportedFormats();
-    const wants=["ean_13","upc_a","upc_e"].filter(x=>supported.includes(x));
-    if(wants.length&&"createImageBitmap" in window){
+    const formats=["ean_13","upc_a","upc_e"].filter(x=>supported.includes(x));
+    if(formats.length&&typeof createImageBitmap==="function"){
      const bitmap=await createImageBitmap(file);
-     try{const detector=new BarcodeDetector({formats:wants});const found=await detector.detect(bitmap);
-       const match=found.find(x=>{const v=String(x.rawValue).replace(/\D/g,"");return tab==="books"||tab==="kids"?/^97[89]\d{10}$/.test(v):/^\d{12,13}$/.test(v)});
-       if(match){raw=match.rawValue;format=match.format}
+     try{
+      const detected=await new BarcodeDetector({formats}).detect(bitmap);
+      const first=detected.find(x=>validReading(x.rawValue));
+      if(first)match={raw:first.rawValue,format:first.format};
      }finally{bitmap.close?.()}
     }
-   }catch(e){}
+   }catch(e){/* Safari often disables BarcodeDetector. Use ZXing instead. */}
   }
-  if(!raw){
-   const api=await ensureReader();const reader=new api.BrowserMultiFormatReader(),url=URL.createObjectURL(file);
-   try{const result=await reader.decodeFromImageUrl(url);raw=result.getText();format=String(result.getBarcodeFormat?.()||"")}
-   finally{URL.revokeObjectURL(url);try{reader.reset?.()}catch(e){}}
-  }
-  if(id!==runId)return;
-  scanActive=true;capturedBarcode(raw,format);
-  if(scanActive){stopAll();status("The photo contained a barcode, but it did not pass the "+(tab==="books"||tab==="kids"?"ISBN":"UPC")+" check. Try another angle or enter the number manually.")}
- }catch(e){if(id===runId){stopAll();photoUnsupported()}}
+  if(!match)match=await photoCandidates(file,token);
+  if(token!==runId||!match)return;
+  scanActive=true;capturedBarcode(match.raw,match.format);
+  if(scanActive){stopAll();throw new Error("The detected barcode failed its check digit")}
+ }catch(e){if(token===runId){stopAll();photoUnsupported(e)}}
  finally{booting=false}
 }
 async function startCamera(){
