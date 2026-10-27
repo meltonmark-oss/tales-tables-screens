@@ -1,4 +1,4 @@
-/* Automatic movie cover enrichment (v29)
+/* Automatic movie cover enrichment (v30)
    Finds art by exact movie/series title, validates that it loads, and places the
    verified image in the edit form. No key, user account, or server required.
    Multi-film collections are intentionally handled as whole products only.
@@ -21,6 +21,22 @@ const existingPoster=x=>{
  if(byTitle&&urlOK(byTitle))return byTitle;
  const saved=(typeof artCache!=="undefined"?artCache[String(x.type||"Movie")+"|"+String(x.title||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()]:null);
  return typeof saved==="string"?saved:(saved?.url||"");
+};
+/* Alternate hosts for the four reported misses. The original poster links can reject
+   hotlinked images, so keep independent sources and verify them in the browser. */
+const BACKUP_POSTERS={
+ "Movie|happy feet":[
+  "https://www.movieposters.com/cdn/shop/products/e3daccb98eacb2612a7e38b63666c823_9f531240-5e0a-4257-a002-d1b97f39b985_grande.jpg?v=1762495870"
+ ],
+ "Movie|shrek: 6-movie collection":[
+  "https://i5.walmartimages.com/seo/Shrek-6-Movie-Collection-DVD_43eb681a-495d-49e2-a394-c72f90e07897.866b22e5f8971d8c81634e70dc707a84.jpeg?odnBg=FFFFFF&odnHeight=768&odnWidth=768"
+ ],
+ "Movie|frozen":[
+  "https://image.tmdb.org/t/p/w500/iE47FOdhS0YKvUmuILkk6kHsaso.jpg"
+ ],
+ "Movie|a goofy movie":[
+  "https://i.pinimg.com/originals/cc/5f/da/cc5fdaa8f8172208b8e6bdf06ea43bc6.jpg"
+ ]
 };
 const resultCache=new Map();
 async function fetchJSONFast(url,ms){
@@ -85,9 +101,12 @@ async function getPoster(record){
  if(!title)return "";
  const k=key(record),previous=resultCache.get(k);
  if(previous&&previous.expires>Date.now())return previous.url;
- const existing=existingPoster(record);
- if(existing&&await imageWorks(existing,4100)){
-  resultCache.set(k,{url:existing,expires:Date.now()+86400000});return existing
+ const candidates=[existingPoster(record),...(BACKUP_POSTERS[k]||[])];
+ for(const candidate of [...new Set(candidates.filter(Boolean))]){
+  if(await imageWorks(candidate,3500)){
+   resultCache.set(k,{url:candidate,expires:Date.now()+86400000});
+   return candidate;
+  }
  }
  const searches=[];
  if(!collection(title)){
@@ -105,7 +124,8 @@ async function getPoster(record){
    }
   }catch(e){}
  }
- resultCache.set(k,{url:"",expires:Date.now()+3*3600000});return "";
+ /* Do not trap unsuccessful scans in a multi-hour negative cache. */
+ return "";
 }
 async function enrichOpenEditor(){
  const form=$("modal"),type=$("fType"),titleField=$("fTitle"),coverInput=$("fCover"),msg=$("coverSuggestion");
@@ -113,15 +133,20 @@ async function enrichOpenEditor(){
  const token=++requestToken,originalTitle=titleField.value.trim(),initialUrl=coverInput.value.trim();
  const item={type:"Movie",title:originalTitle,year:Number($("fYear")?.value)||null,cover:""};
  const liveRecord=typeof items!=="undefined"?items.find(x=>x.type==="Movie"&&nameKey(x.title)===nameKey(originalTitle)):null;
- if(liveRecord?.cover){return} /* Never override a saved user cover. */
- if(initialUrl&&await imageWorks(initialUrl,3800)){return}
+ if(liveRecord?.cover){msg.textContent="Existing custom cover preserved.";return}
+ msg.textContent="Checking poster artwork for “"+originalTitle+"”…";
+ if(initialUrl&&await imageWorks(initialUrl,3500)){
+  if(token===requestToken)msg.textContent="Cover link is ready. Tap Save item to store it.";
+  return;
+ }
  if(token!==requestToken)return;
- if(initialUrl)coverInput.value="";
- msg.textContent="Finding a movie poster for “"+originalTitle+"”…";
+ /* The former code silently left a broken image URL in the form. */
+ if(initialUrl&&coverInput.value.trim()===initialUrl)coverInput.value="";
+ msg.textContent="First image did not load. Checking alternate movie poster sources…";
  const url=await getPoster(item);
  if(token!==requestToken||!form.classList.contains("open")||type.value!=="Movie"||titleField.value.trim()!==originalTitle)return;
- if(!url){msg.textContent="No confident cover match yet. You can tap Find a matching cover or paste an image URL.";return}
- if(coverInput.value.trim())return; /* Do not overwrite manual input. */
+ if(!url){msg.textContent="No working image found from the available cover sources. Tap Find a matching cover to retry, or paste a cover link.";return}
+ if(coverInput.value.trim())return; /* Do not overwrite a cover entered during lookup. */
  coverInput.value=url;
  msg.innerHTML='<p style="margin:5px 0">Poster found for '+escapeHtml(originalTitle)+'. Check it, then tap Save item.</p><img src="'+escapeHtml(url)+'" alt="Suggested movie poster" style="max-width:135px;max-height:190px;object-fit:contain;background:#fff;border:1px solid #bca387;border-radius:4px">';
 }
@@ -138,5 +163,9 @@ window.enrichSavedMovie=async function(id){
  if(typeof render==="function")render();
 };
 window.movieCoverLookup=getPoster;
+window.retryMovieCover=function(){
+  resultCache.clear();
+  return enrichOpenEditor();
+};
 window.autoMovieCover=enrichOpenEditor;
 })();
