@@ -1,4 +1,4 @@
-/* Movie metadata and cover enrichment v32.
+/* Movie metadata and cover enrichment v33.
    Works in browser without API keys. Never substitutes a single-film image for
    a multipack and never overwrites a working user-selected cover. */
 (function(){
@@ -115,7 +115,8 @@ async function chooseCover(title,year,manualCover,remoteData){
 }
 async function lookup(record){
  if(!record||record.type!=="Movie")return null;
- const cleaned=cleanTitle(record.title),year=Number(record.year)||null;
+ const verified=(typeof VERIFIED_UPCS!=="undefined"&&record.barcode)?VERIFIED_UPCS[String(record.barcode).replace(/\D/g,"")]:null;
+ const cleaned=verified?.title||cleanTitle(record.title),year=Number(record.year)||Number(verified?.year)||null;
  if(!cleaned)return null;
  const cacheId=key(cleaned)+"|"+(year||"");
  let remote=lookupCache.get(cacheId);
@@ -130,7 +131,8 @@ async function lookup(record){
   if(!genre&&x.genre)genre=x.genre;
   if(!filmYear&&x.year)filmYear=x.year;
  }
- const cover=await chooseCover(record.title,year,record.cover,remote);
+ if(!genre&&verified?.genre)genre=verified.genre;
+ const cover=await chooseCover(cleaned,year,record.cover,remote);
  return {title:cleaned,year:filmYear,genre,cover,source:remote.map(x=>x.source).join(" + ")};
 }
 function escape(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -144,7 +146,7 @@ function fillEditor(){
  else state.textContent="Looking for movie details and a cover for “"+title+"”…";
  const activeTitle=titleEl.value.trim();
  return (async()=>{
-  const record={type:"Movie",title:activeTitle,year:Number(yearEl.value)||null,cover:originalCover};
+  const record={type:"Movie",title:activeTitle,year:Number(yearEl.value)||null,cover:originalCover,barcode:$("fBarcode").value.trim()};
   const data=await lookup(record);
   if(ticket!==requestToken||!el.classList.contains("open")||kind.value!=="Movie"||titleEl.value.trim()!==activeTitle)return;
   if(!data){state.textContent="No movie details found right now. You can edit the fields manually.";return}
