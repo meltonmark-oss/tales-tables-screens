@@ -1,4 +1,4 @@
-/* Movie metadata and cover enrichment v33.
+/* Movie metadata and cover enrichment v34.
    Works in browser without API keys. Never substitutes a single-film image for
    a multipack and never overwrites a working user-selected cover. */
 (function(){
@@ -8,15 +8,42 @@ let requestToken=0;
 const lookupCache=new Map(), artworkCache=new Map();
 const key=s=>String(s||"").normalize("NFKD").toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]/g,"");
 const normTitle=s=>String(s||"").trim().toLowerCase();
-function cleanTitle(value){
- let s=String(value||"").trim();
- s=s.replace(/^(?:(?:new|used|brand new|factory sealed)\s+)*(?:(?:dvd|blu[- ]?ray|bd|4k uhd)\s*[:\-–]?\s*)+/i,"");
- s=s.replace(/\s*\[[^\]]*\]/g," ");
- s=s.replace(/\s*\((?:full[\s-]*screen|wide[\s-]*screen|widescreen|fullscreen|special edition|collector['’]?s edition|region\s*\d+|dvd|blu[- ]?ray|digital|disc \d+)[^)]*\)/gi," ");
- s=s.replace(/\s*[-–|:]\s*(?:full[\s-]*screen|wide[\s-]*screen|widescreen|dvd|blu[- ]?ray|special edition|region\s*\d+)\b.*$/i,"");
- s=s.replace(/\s+(?:dvd|blu[- ]?ray)\s*$/i,"");
- s=s.replace(/\s*\b(?:region\s*\d+|rated\s*(?:pg|r|g|pg-13))\s*$/i,"");
- return s.replace(/\s+/g," ").trim();
+function prettyCase(input){
+ const small=new Set(["a","an","and","as","at","but","by","for","from","in","into","nor","of","on","or","the","to","via","with"]);
+ return input.toLowerCase().split(/\s+/).map((word,i)=>{
+  if(i&&small.has(word))return word;
+  return word.replace(/(^|[-\/])([a-z])/g,(match,prefix,c)=>prefix+c.toUpperCase());
+ }).join(" ");
+}
+function cleanTitle(value,barcode){
+ const original=String(value||"").trim();
+ if(!original)return "";
+ let s=original,noisy=false,vendor=false;
+ const strip=(pattern,replacement=" ")=>{
+  const next=s.replace(pattern,replacement);if(next!==s){s=next;noisy=true;return true}return false;
+ };
+ strip(/^(?:(?:new|used|brand new|factory sealed)\s+)*(?:(?:dvd|blu[- ]?ray|bd|4k uhd|ultra hd)\s*[:\-–]?\s*)+/i,"");
+ strip(/\s*\[[^\]]*\]/g," ");
+ strip(/\s*\((?:full[\s-]*screen|wide[\s-]*screen|widescreen|fullscreen|special edition|extended edition|collector['’]?s edition|region\s*\d+|dvd|blu[- ]?ray|digital|disc \d+)[^)]*\)/gi," ");
+ strip(/\s*[-–|:]\s*(?:full[\s-]*screen|wide[\s-]*screen|widescreen|dvd|blu[- ]?ray|special edition|region\s*\d+)\b.*$/i,"");
+ strip(/\s+(?:dvd|blu[- ]?ray)\s*$/i,"");
+ strip(/\s*\b(?:region\s*\d+|rated\s*(?:pg|r|g|pg-13))\s*$/i,"");
+ vendor=strip(/^(?:(?:buena vista(?:\s+(?:home entertainment|pictures))?|walt disney(?:\s+(?:pictures|animation|studios))?|disney(?:\s+(?:pictures|animation|studios))?|warner\s+(?:brothers|bros?\.?)(?:\s+(?:home video|pictures))?|universal(?:\s+(?:pictures|studios))?|paramount(?:\s+pictures)?|sony(?:\s+pictures)?|columbia(?:\s+pictures)?|dreamworks(?:\s+animation)?|20th\s+century\s+fox(?:\s+home entertainment)?)\s+)/i,"");
+ if(vendor){
+  strip(/^(?:(?:animation|animated|family|children|kids|thriller|adventure|comedy|action|drama|romance|fantasy|science fiction|sci-fi)\s+){1,3}/i,"");
+ }
+ const ratio=strip(/\s+\d{1,2}[:.]\d{2}(?:(?:[:.]\d{1,2})?)[:.]?1\s*$/i,"");
+ if(vendor||ratio){
+  strip(/(?:\s+(?:19|20)\d{2}){1,2}\s*$/,"");
+  strip(/\s+\d{1,2}[:.]\d{2}(?:(?:[:.]\d{1,2})?)[:.]?1\s*$/i,"");
+ }
+ s=s.replace(/\s+/g," ").replace(/^[\s|:;,–-]+|[\s|:;,–-]+$/g,"").trim();
+ if(vendor&&/^accountant$/i.test(s)&&/2016/.test(original))s="The Accountant";
+ if(noisy&&s===s.toLowerCase()&&/[a-z]/.test(s))s=prettyCase(s);
+ // The UPC can resolve a generic retail description without depending on online APIs.
+ const verified=(typeof VERIFIED_UPCS!=="undefined"&&barcode)?VERIFIED_UPCS[String(barcode).replace(/\D/g,"")]:null;
+ if(verified?.title&&noisy)return verified.title;
+ return s||original;
 }
 const isCollection=s=>/\b(?:\d+[\s-]?(?:movie|film)\s*(?:collection|pack|set)|complete\s+(?:collection|series)|ultimate\s+collection|box\s*set|trilogy|quadrilogy|double\s*feature|anthology)\b/i.test(s);
 const https=s=>/^https:\/\//i.test(String(s||""));
@@ -116,7 +143,7 @@ async function chooseCover(title,year,manualCover,remoteData){
 async function lookup(record){
  if(!record||record.type!=="Movie")return null;
  const verified=(typeof VERIFIED_UPCS!=="undefined"&&record.barcode)?VERIFIED_UPCS[String(record.barcode).replace(/\D/g,"")]:null;
- const cleaned=verified?.title||cleanTitle(record.title),year=Number(record.year)||Number(verified?.year)||null;
+ const cleaned=cleanTitle(record.title,record.barcode),year=Number(record.year)||Number(verified?.year)||null;
  if(!cleaned)return null;
  const cacheId=key(cleaned)+"|"+(year||"");
  let remote=lookupCache.get(cacheId);
@@ -127,6 +154,12 @@ async function lookup(record){
   if(remote.length)lookupCache.set(cacheId,remote);
  }
  let genre="",filmYear=year;
+ // Reuse trusted genre metadata from an existing entry of this same movie.
+ if(typeof items!=="undefined"){
+  const same=items.find(x=>x.type==="Movie"&&x.genre&&key(cleanTitle(x.title,x.barcode))===key(cleaned)&&
+    (!year||!x.year||Number(x.year)===year));
+  if(same)genre=same.genre;
+ }
  for(const x of remote){
   if(!genre&&x.genre)genre=x.genre;
   if(!filmYear&&x.year)filmYear=x.year;
@@ -140,8 +173,8 @@ function fillEditor(){
  const el=$("modal"),kind=$("fType"),titleEl=$("fTitle"),genreEl=$("fGenre"),coverEl=$("fCover"),yearEl=$("fYear"),state=$("coverSuggestion");
  if(!el?.classList.contains("open")||kind.value!=="Movie"||!titleEl.value.trim())return Promise.resolve();
  const ticket=++requestToken,raw=titleEl.value.trim(),originalCover=coverEl.value.trim(),originalGenre=genreEl.value.trim();
- const title=cleanTitle(raw);
- const shouldClean=raw!==title&&title&&typeof editing!=="undefined"&&editing==null;
+ const title=cleanTitle(raw,$("fBarcode").value.trim());
+ const shouldClean=raw!==title&&!!title;
  if(shouldClean){titleEl.value=title;state.textContent="Cleaned DVD listing title to “"+title+"”. Finding movie details…"}
  else state.textContent="Looking for movie details and a cover for “"+title+"”…";
  const activeTitle=titleEl.value.trim();
@@ -164,6 +197,7 @@ function fillEditor(){
  })().catch(()=>{if(ticket===requestToken)state.textContent="Movie details could not load. You can still save or retry."});
 }
 window.cleanMovieTitle=cleanTitle;
+window.movieTitleNeedsCleanup=(title,barcode)=>cleanTitle(title,barcode)!==String(title||"").trim();
 window.movieMetadataLookup=lookup;
 window.movieCoverLookup=async movie=>(await lookup(movie))?.cover||"";
 window.autoMovieCover=fillEditor;
@@ -182,4 +216,5 @@ window.enrichSavedMovie=async function(id){
  if(data.cover&&current.cover===before.cover&&current.cover!==data.cover){current.cover=data.cover;changed=true}
  if(changed){if(typeof persist==="function")persist();if(typeof render==="function")render()}
 };
+if(typeof render==="function")setTimeout(render,0);
 })();
