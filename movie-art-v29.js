@@ -173,7 +173,10 @@ function fillEditor(){
  const el=$("modal"),kind=$("fType"),titleEl=$("fTitle"),genreEl=$("fGenre"),coverEl=$("fCover"),yearEl=$("fYear"),state=$("coverSuggestion");
  if(!el?.classList.contains("open")||kind.value!=="Movie"||!titleEl.value.trim())return Promise.resolve();
  const ticket=++requestToken,raw=titleEl.value.trim(),originalCover=coverEl.value.trim(),originalGenre=genreEl.value.trim();
- const title=cleanTitle(raw,$("fBarcode").value.trim());
+ const barcode=$("fBarcode").value.trim(),title=cleanTitle(raw,barcode);
+ const hint=(typeof VERIFIED_UPCS!=="undefined"?VERIFIED_UPCS[barcode]:null);
+ if(!genreEl.value.trim()&&hint?.genre)genreEl.value=hint.genre;
+ if(!yearEl.value&&hint?.year)yearEl.value=hint.year;
  const shouldClean=raw!==title&&!!title;
  if(shouldClean){titleEl.value=title;state.textContent="Cleaned DVD listing title to “"+title+"”. Finding movie details…"}
  else state.textContent="Looking for movie details and a cover for “"+title+"”…";
