@@ -369,14 +369,14 @@ function applyBarcodeToEditor(raw){
   if(code.length===13&&code[0]==="0"&&validEAN13(code))code=code.slice(1);
   if(!validUPC(code)&&!validEAN13(code)){$("scanStatus").textContent="A valid 12-digit UPC or 13-digit EAN is required.";return false}
  }
- const duplicate=items.find(x=>x.barcode&&x.barcode.replace(/\\D/g,"").replace(/^0+/,"")===code.replace(/^0+/,"")&&String(x.id)!==String(editing));
+ const duplicate=items.find(x=>x.barcode&&x.barcode.replace(/\D/g,"").replace(/^0+/,"")===code.replace(/^0+/,"")&&String(x.id)!==String(editing));
  if(duplicate&&!confirm("This code is already on "+duplicate.title+". Use it on the current item too?")){$("scanStatus").textContent="No change made. That barcode is already assigned to "+duplicate.title+".";return false}
  $("fBarcode").value=code;
  $("lookupStatus").textContent=(isBook?"ISBN ":"UPC / EAN ")+code+" filled in. Review this item and tap Save item to keep it.";
  $("scanClose").click();
  return true;
 }
-function capturedBarcode(raw,format){let code=String(raw||"").replace(/\\D/g,"");if(!code||!scanActive)return;const books=scanWantsBook();
+function capturedBarcode(raw,format){let code=String(raw||"").replace(/\D/g,"");if(!code||!scanActive)return;const books=scanWantsBook();
 if(books){if(!validEAN13(code)||!/^97[89]/.test(code)){$("scanStatus").textContent="Looking for a valid ISBN beginning 978 or 979. Last other reading: "+code;return}}
 else{if(code.length===13&&code[0]==="0"&&validEAN13(code))code=code.slice(1);
 if(!(validUPC(code)||validEAN13(code))){$("scanStatus").textContent="Detected "+(format||"other barcode")+" ("+code+"), but not a valid UPC. Keep the full main barcode in view.";return}}
