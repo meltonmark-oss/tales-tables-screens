@@ -23,7 +23,7 @@ function cleanTitle(value,barcode){
   const next=s.replace(pattern,replacement);if(next!==s){s=next;noisy=true;return true}return false;
  };
  strip(/^(?:(?:new|used|brand new|factory sealed)\s+)*(?:(?:dvd|blu[- ]?ray|bd|4k uhd|ultra hd)\s*[:\-–]?\s*)+/i,"");
- strip(/\s*\[[^\]]*\]/g," ");
+ strip(/\s*\[(?:dvd|blu[- ]?ray|bd|\d{4}|region\s*\d+|us\s*import|uk\s*import|ntsc|pal|full\s*screen(?:\s*edition)?|wide\s*screen(?:\s*edition)?|widescreen|fullscreen|special\s*edition|extended\s*edition|digital\s*copy|\d+\s*discs?)(?:[^\]]*)\]/gi," ");
  strip(/\s*\((?:full[\s-]*screen|wide[\s-]*screen|widescreen|fullscreen|special edition|extended edition|collector['’]?s edition|region\s*\d+|dvd|blu[- ]?ray|digital|disc \d+)[^)]*\)/gi," ");
  strip(/\s*[-–|:]\s*(?:full[\s-]*screen|wide[\s-]*screen|widescreen|dvd|blu[- ]?ray|special edition|region\s*\d+)\b.*$/i,"");
  strip(/\s+(?:dvd|blu[- ]?ray)\s*$/i,"");
