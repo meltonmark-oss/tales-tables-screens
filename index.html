@@ -212,6 +212,19 @@ footer{color:#776d60!important;font:12px system-ui,sans-serif}
  .cards{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:19px 10px!important}
  body[data-tab] .item .label{font-size:11px!important}
 }
+
+/* Bring the themed rooms back behind the refreshed interface. */
+body[data-tab]::before{
+ background-image:linear-gradient(90deg,rgba(20,16,13,.22),rgba(20,16,13,.08) 48%,rgba(20,16,13,.22)),var(--scene)!important;
+ background-size:cover,cover!important;background-position:center,center!important;
+ background-repeat:no-repeat!important;opacity:1!important;filter:none!important
+}
+body[data-tab] .intro{background:linear-gradient(100deg,#fbf6ebf7 0%,#f6f1e7ef 60%,#e8efdfdf 100%)!important;box-shadow:0 8px 30px #1e171b3d!important}
+body[data-tab] .toolbar{box-shadow:0 5px 20px #21170f35!important}
+body[data-tab] .shelf{background:#eee4d9f5!important;box-shadow:0 8px 28px #1d130e55!important}
+body[data-tab] .note{background:#fbf8f0ee!important;border-radius:8px!important;padding:7px 10px!important;width:max-content;max-width:100%!important;color:#5f554b!important}
+body[data-tab] .actions>button,.utility-drawer summary{box-shadow:0 3px 12px #1d130f35!important}
+@media(max-width:700px){body[data-tab]::before{background-size:cover,auto 100vh!important;background-position:center,center!important}}
 </style></head>
 <body data-tab="books">
 <div class="topbar">
