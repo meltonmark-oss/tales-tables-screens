@@ -144,7 +144,75 @@ body[data-tab="movies"] .cover{background:linear-gradient(145deg,#437cdb,#153a8d
 .shelf::after{z-index:-1!important}
 .cards{z-index:5!important;transform:none!important}
 .item,.cover,.cover img{visibility:visible!important;opacity:1!important}
-.book-filter[hidden],.book-field[hidden]{display:none!important}#scanResult{margin-top:14px}#scanResult button{padding:10px;background:#ffdfaa;border-radius:7px;border:1px solid #a87537}#scanResult a{color:#174da8}#scanCode{width:100%;padding:10px;margin-top:6px}#lookupBook{padding:9px;background:#e5d1aa;border:1px solid #a87537;border-radius:6px}</style><link rel="stylesheet" href="venue-v24.css?v=24"><link rel="stylesheet" href="venue-v25.css?v=25"><script src="game-night-v24.js?v=24" defer></script><script src="scanner-v26.js?v=28" defer></script><script src="movie-art-v29.js?v=35" defer></script></head>
+.book-filter[hidden],.book-field[hidden]{display:none!important}#scanResult{margin-top:14px}#scanResult button{padding:10px;background:#ffdfaa;border-radius:7px;border:1px solid #a87537}#scanResult a{color:#174da8}#scanCode{width:100%;padding:10px;margin-top:6px}#lookupBook{padding:9px;background:#e5d1aa;border:1px solid #a87537;border-radius:6px}</style><link rel="stylesheet" href="venue-v24.css?v=24"><link rel="stylesheet" href="venue-v25.css?v=25"><script src="game-night-v24.js?v=24" defer></script><script src="scanner-v26.js?v=28" defer></script><script src="movie-art-v29.js?v=35" defer></script><style id="reading-room-refresh">
+/* A calmer, warmer reading-room interface */
+:root{color-scheme:light}
+body[data-tab]{--accent:#516b55;--accent-dark:#364e3b;--paper:#faf7ef;--muted:#746b5f;color:#392f27!important;background:#f3eee4!important;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body[data-tab="movies"]{--accent:#53677b;--accent-dark:#354b62}
+body[data-tab="games"]{--accent:#806745;--accent-dark:#5c4930}
+body[data-tab="kids"]{--accent:#99718d;--accent-dark:#79536e}
+body[data-tab]::before{background:radial-gradient(ellipse at 90% 0%,#dfebdc 0,transparent 42%),linear-gradient(#f9f6ee,#eee7db)!important;opacity:1!important;filter:none!important}
+.topbar,body[data-tab] .topbar{background:#fbf8f0f7!important;border-bottom:1px solid #e2d9ca!important;box-shadow:0 3px 18px #4b38200d!important;padding:10px clamp(14px,3vw,38px)!important;gap:18px}
+.topbar h1{font:600 clamp(16px,1.5vw,21px) Georgia,serif!important;color:#42382e!important;text-shadow:none!important;letter-spacing:-.02em}
+.topbar h1::before{content:"✦";color:#8a9b7b;font-size:1em;margin-right:9px}
+.topbar nav{gap:3px}
+.topbar nav button{background:transparent!important;color:#6d665b!important;border:0!important;border-radius:9px!important;box-shadow:none!important;font:600 13px system-ui,sans-serif!important;padding:10px 12px!important}
+.topbar nav button:hover{background:#f0eadf!important;color:#3b463a!important}
+.topbar nav button[aria-selected="true"]{background:#e1e9dc!important;color:#36533c!important;border:0!important;box-shadow:none!important}
+.top-actions button{font:600 12px system-ui,sans-serif;color:#59665a;background:#f7f4ed;border:1px solid #ded8ca;border-radius:9px}
+.top-actions button:hover{background:#e8eee3}
+main{max-width:1260px!important;padding:28px clamp(16px,3.5vw,44px) 70px!important}
+body[data-tab] .intro{position:relative;overflow:hidden;max-width:none!important;min-height:165px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;margin:0 auto 20px!important;padding:30px clamp(24px,5vw,64px)!important;background:linear-gradient(100deg,#f8f2e5 0%,#f5eee1ef 58%,#e1eadbe6 100%)!important;border:1px solid #e7dece!important;border-radius:20px!important;box-shadow:0 8px 30px #5c4c3610!important;outline:none!important}
+body[data-tab] .intro:before{content:"YOUR COLLECTION"!important;display:block!important;background:none!important;color:var(--accent-dark)!important;text-shadow:none!important;box-shadow:none!important;font:700 10px system-ui,sans-serif!important;letter-spacing:.17em!important;margin:0 0 10px!important;padding:0!important}
+body[data-tab] .intro:after{content:"✦" !important;position:absolute;right:8%;top:19%;color:#acbd9e!important;font:normal 90px Georgia,serif!important;letter-spacing:normal!important;text-shadow:none!important;opacity:.3}
+body[data-tab] .intro h2{font:500 clamp(32px,4vw,52px)/1.05 Georgia,serif!important;letter-spacing:-.035em;color:#40362d!important;text-shadow:none!important;margin:0!important}
+body[data-tab] .intro p{font:400 15px/1.5 system-ui,sans-serif!important;color:#756b5e!important;letter-spacing:0;margin:9px 0 0!important}
+body[data-tab] .toolbar{max-width:none!important;background:#fcfaf5!important;border:1px solid #e6dfd3!important;border-radius:14px!important;box-shadow:0 5px 20px #55462f09!important;padding:12px!important;gap:8px!important}
+body[data-tab] .toolbar input,body[data-tab] .toolbar select{background:#f7f5ef!important;border:1px solid #e3ded4!important;border-radius:9px!important;color:#4a453e!important;font:500 13px system-ui,sans-serif!important;min-height:44px!important;padding:10px!important}
+body[data-tab] .toolbar input:focus,body[data-tab] .toolbar select:focus{outline:2px solid #91a88d;outline-offset:1px}
+#filterToggle{background:#e4ecdf!important;border:1px solid #d0deca!important;color:#3e5b42!important;border-radius:9px!important;font:600 13px system-ui,sans-serif!important}
+body[data-tab] .actions{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:14px 0 18px!important;justify-content:flex-start!important;max-width:none}
+body[data-tab] .actions button,.utility-drawer summary{font:600 13px system-ui,sans-serif!important;color:#4b5549!important;background:#fbfaf5!important;border:1px solid #dfd9cd!important;border-radius:9px!important;box-shadow:none!important;padding:10px 15px!important;min-height:42px!important}
+body[data-tab] .actions button:hover,.utility-drawer summary:hover{background:#eef2e9!important}
+body[data-tab] .actions #add{background:var(--accent)!important;color:white!important;border-color:var(--accent)!important}
+.utility-drawer[open]{background:#faf8f2!important;border:1px solid #e2dbce!important}
+body[data-tab] .note{background:transparent!important;border:0!important;box-shadow:none!important;color:#756c61!important;text-shadow:none!important;text-align:left;max-width:none;font:400 12px/1.5 system-ui,sans-serif!important;padding:2px 2px 8px!important}
+body[data-tab] .shelf{max-width:none!important;background:#e9ded0!important;border:1px solid #d9c8b5!important;border-radius:17px!important;padding:23px!important;box-shadow:inset 0 1px 0 #fff9,0 8px 25px #614e3812!important}
+.shelf::before,.shelf::after{display:none!important;content:none!important}
+.cards{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))!important;gap:23px 20px!important}
+.item{filter:none!important;padding:0!important;color:#40372f!important;transition:transform .18s ease!important}
+.item:hover{filter:none!important;transform:translateY(-4px)!important}
+body[data-tab] .cover{border:0!important;border-radius:6px!important;box-shadow:0 5px 12px #5543352b!important;aspect-ratio:2/3}
+.cover img{object-fit:cover!important;border-radius:5px}
+body[data-tab] .item .label{font:600 12px/1.35 system-ui,sans-serif!important;color:#483e35!important;text-shadow:none!important;margin-top:9px!important}
+body[data-tab] .item small{font:600 11px system-ui,sans-serif!important;color:#785a4f!important}
+body[data-tab] .panel{background:#fbf8f1;color:#40372f;border:1px solid #e3d8c8;border-radius:18px;box-shadow:0 24px 70px #2b211b55;font-family:system-ui,sans-serif}
+.panel h2{font:500 28px Georgia,serif;color:#42382e}
+.panel .fields input,.panel .fields select{border:1px solid #ddd4c5;border-radius:8px;background:white;min-height:43px}
+.panel button{border-radius:9px;background:#e5ebdf;border:1px solid #cdd9c9;color:#344d38}
+body[data-tab] .game-night{background:#fbf8f1!important;color:#483e35!important;border:1px solid #e5dac8!important;border-radius:16px!important;box-shadow:0 8px 24px #4637240c!important}
+.game-night .gn-top h3,.game-night .gn-top p,.game-night .gn-controls label,.game-night .gn-note{color:#514b40!important;text-shadow:none!important}
+.game-night .gn-controls button{background:#61775d!important;color:white!important;border:0!important;box-shadow:none!important}
+footer{color:#776d60!important;font:12px system-ui,sans-serif}
+@media(max-width:700px){
+ body[data-tab] .topbar{padding:9px 12px!important;gap:8px!important;background:#fbf8f0f7!important}
+ .topbar header h1{font-size:17px!important}
+ .topbar nav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px!important}
+ .topbar nav button{font-size:10px!important;line-height:1.2!important;min-height:43px!important;padding:6px 3px!important}
+ main{padding:15px 13px 48px!important}
+ body[data-tab] .intro{min-height:126px;padding:20px 22px!important;margin-bottom:12px!important;border-radius:15px!important}
+ body[data-tab] .intro h2{font-size:32px!important}
+ body[data-tab] .intro p{font-size:13px!important}
+ body[data-tab] .intro:after{font-size:55px!important;right:8%}
+ body[data-tab] .toolbar{padding:8px!important}
+ body[data-tab] .toolbar input,body[data-tab] .toolbar select{font-size:14px!important}
+ body[data-tab] .actions{gap:6px!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;margin:11px 0 12px!important}
+ body[data-tab] .actions>button,.utility-drawer summary{padding:7px 3px!important;font-size:10px!important;min-height:43px!important}
+ body[data-tab] .shelf{padding:13px 11px!important;border-radius:13px!important}
+ .cards{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:19px 10px!important}
+ body[data-tab] .item .label{font-size:11px!important}
+}
+</style></head>
 <body data-tab="books">
 <div class="topbar">
 <header><h1>Tales, Tables &amp; Screens</h1><p>Stories, Screens &amp; Shenanigans</p></header>
