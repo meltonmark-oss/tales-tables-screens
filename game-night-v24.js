@@ -3,7 +3,7 @@
 "use strict";
 const GUIDE=[
 ["Exploding Kittens",2,5,15,"competitive"],["Zombie Kittens",2,5,15,"competitive"],["Exploding Kittens: Good vs Evil",2,5,15,"competitive"],
-["Coup",2,6,15,"competitive"],["The Goonies: Never Say Die",2,5,50,"cooperative"],["Tesseract",1,4,30,"cooperative"],
+["Coup",2,6,15,"competitive"],["The Goonies: Never Say Die",2,5,50,"cooperative"],["Tesseract",1,4,60,"cooperative"],
 ["The Lord of the Rings: The Card Game",1,4,60,"cooperative"],["Pandemic",2,4,45,"cooperative"],["Pandemic: Rapid Response",2,4,20,"cooperative"],
 ["Pandemic Legacy: Season 1",2,4,60,"cooperative"],["T.I.M.E Stories",2,4,90,"cooperative"],["Fuse",1,5,10,"cooperative"],
 ["Forbidden Desert",2,5,45,"cooperative"],["Commissioned",2,6,60,"cooperative"],["King of Tokyo",2,6,30,"competitive"],
@@ -78,7 +78,7 @@ function buildPlan(){
  lastPlan=planned;
  const play=planned.reduce((sum,g)=>sum+g.playMinutes,0),breaks=Math.max(0,planned.length-1)*5;
  const alternatives=eligible.filter(g=>!used.has(String(g.id))).sort((a,b)=>a.playMinutes-b.playMinutes).slice(0,5);
- const cards=planned.map((g,i)=>'<article class="gn-game"><div class="gn-count">'+(i===0?'Start with':'Then play')+' · '+(i+1)+'</div><div class="gn-title">'+escapeHtml(g.title)+'</div><p class="gn-detail">'+g.minPlayers+'–'+g.maxPlayers+' players · about '+formatTime(g.playMinutes)+'<br>'+labelMood(g.gameMood)+'</p><button type="button" data-game-id="'+escapeHtml(g.id)+'">View game details</button></article>').join("");
+ const cards=planned.map((g,i)=>'<article class="gn-game"><div class="gn-count">'+(i===0?'Start with':'Then play')+'</div><div class="gn-title">'+escapeHtml(g.title)+'</div><p class="gn-detail">'+g.minPlayers+'–'+g.maxPlayers+' players · about '+formatTime(g.playMinutes)+'<br>'+labelMood(g.gameMood)+'</p><button type="button" data-game-id="'+escapeHtml(g.id)+'">View game details</button></article>').join("");
  output.innerHTML='<div class="gn-plan-head"><h4>Your game-night lineup</h4><button type="button" id="gnShuffle" class="gn-button">🎲 Shuffle picks</button></div><div class="gn-game-list">'+cards+'</div><p class="gn-alts">Estimated play: '+formatTime(play)+(breaks?' + '+breaks+' min for switching games':'')+' · '+(remaining>0?formatTime(remaining)+' left in your window':'fills your time window')+'. Times vary by group.</p>'+(alternatives.length?'<p class="gn-alts">Other matches: '+alternatives.map(g=>escapeHtml(g.title)).join(' · ')+'</p>':'');
 }
 function labelMood(v){return {cooperative:"Cooperative",competitive:"Competitive",party:"Party / group",family:"Family / relaxed"}[v]||"Any style"}
@@ -93,7 +93,7 @@ function init(){
  $id("gnBuild").addEventListener("click",buildPlan);
  $id("gnResults").addEventListener("click",event=>{
  const editGame=event.target.closest("[data-game-id]");
- if(editGame&&typeof edit==="function"){edit(editGame.dataset.gameId);return}
+ if(editGame&&typeof showDetails==="function"){showDetails(editGame.dataset.gameId);return}
  if(event.target.closest("#gnShuffle"))buildPlan();
  });
  window.renderGameNight();
