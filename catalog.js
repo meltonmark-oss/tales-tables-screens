@@ -263,8 +263,11 @@ function render() {
   const room = sections[tab];
   document.body.dataset.tab = tab;
   $("heading").textContent = room.room;
-  const artPath = "art/" + tab + ".svg";
-  if ($("roomArt").getAttribute("src") !== artPath) $("roomArt").src = artPath;
+  $("roomArt").hidden = tab === "kids";
+  if (tab !== "kids") {
+    const artPath = "art/" + tab + ".svg";
+    if ($("roomArt").getAttribute("src") !== artPath) $("roomArt").src = artPath;
+  }
   $("search").placeholder = "Search " + room.search;
   $("search").setAttribute("aria-label", "Search " + room.search);
   document.querySelectorAll("[data-go]").forEach(button => {
@@ -792,4 +795,5 @@ if(existing.length||byVerifiedTitle){
 }if((scanWantsBook()&&validISBN(code))||/^97[89]\d{10}$/.test(code)){try{const info=await isbnInfo(code);const match=matchingItems(info,"Book");out.innerHTML='<p>'+esc(info.title)+' · '+esc(info.author)+' · '+esc(info.pages||"Unknown")+' pages</p><button id="scanApply">Review this edition</button>'+(match.length?'<p>Existing title: '+esc(match.map(x=>x.title).join(", "))+'</p>':"");$("scanApply").onclick=()=>applyBookInfo(info);$("scanStatus").textContent="Exact ISBN record found; review before saving.";return}catch(e){$("scanStatus").textContent="No ISBN edition record found.";showManualUPC(code,"Could not find that ISBN edition. Enter the details manually.","Book");return}}
 try{const info=await upcInfo(code);if(info){const matches=matchingItems(info,tab==="games"?"Game":"Movie");out.innerHTML='<p>Possible product: '+esc(info.title)+'</p><p style="font-size:13px">Source: '+esc(info.source)+'. Confirm that the title and edition match your copy.</p><button id="scanApplyUPC">Review and save</button>'+(matches.length?'<p>Already in your collection by title: '+esc(matches.map(x=>x.title).join(", "))+'</p>':"");$("scanApplyUPC").onclick=()=>applyUPCInfo(info);$("scanStatus").textContent="Product match found. Review before saving.";return}showManualUPC(code,"No product match found for this UPC. You can search by number or add it manually.");$("scanStatus").textContent="No matching product record."}catch(e){showManualUPC(code,"The UPC lookup service could not be reached from this browser or is rate-limited. The scanner captured the number correctly.");$("scanStatus").textContent="UPC database unavailable; barcode read successfully."}};
 
-render();
+if (location.hash === "#kids") switchTab("kids");
+else render();
