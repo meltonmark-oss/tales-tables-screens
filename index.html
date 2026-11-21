@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#233027">
   <meta name="description" content="Browse the Melton collection of books, movies, TV, and tabletop games.">
   <title>Tales, Tables &amp; Screens</title>
-  <link rel="stylesheet" href="collection.css?v=43">
+  <link rel="stylesheet" href="collection.css?v=44">
   <script src="catalog-data.js?v=41" defer></script>
   <script src="catalog-details.js?v=41" defer></script>
-  <script src="catalog.js?v=43" defer></script>
+  <script src="catalog.js?v=44" defer></script>
   <script src="movie-art-v29.js?v=35" defer></script>
   <script src="game-night-v24.js?v=41" defer></script>
   <script src="scanner-v26.js?v=28" defer></script>
@@ -67,7 +67,6 @@
 
   <main class="shell" id="collection">
     <section class="room" aria-labelledby="heading">
-      <img id="roomArt" class="room-art" src="art/books.svg" alt="" fetchpriority="high">
       <div class="room-text">
         <h2 id="heading">Great Library</h2>
         <p id="roomCount"></p>
@@ -145,7 +144,8 @@
     <div class="results-bar">
       <p id="summary" aria-live="polite"></p>
       <div class="view-controls" role="group" aria-label="Collection view">
-        <button type="button" class="button" data-view="grid" aria-label="Grid view" title="Grid view" aria-pressed="true"><svg class="icon"><use href="#icon-grid"/></svg></button>
+        <button type="button" id="gridView" class="button" data-view="grid" aria-label="Covers grid view" title="Covers grid view" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#icon-grid"/></svg><span>Covers</span></button>
+        <button type="button" id="spinesView" class="button" data-view="spines" aria-label="Spines view" aria-pressed="false">Spines</button>
         <button type="button" class="button" data-view="list" aria-label="List view" title="List view" aria-pressed="false"><svg class="icon"><use href="#icon-list"/></svg></button>
       </div>
     </div>
@@ -162,6 +162,7 @@
       <div class="dialog-actions">
         <button type="button" class="button primary" id="detailEdit">Edit item</button>
         <button type="button" class="button secondary" id="detailEdition"><svg class="icon"><use href="#icon-scan"/></svg>Compare ISBN edition</button>
+        <button type="button" class="button secondary" id="returnGame" hidden>Return to the wall</button>
       </div>
     </div>
   </dialog>

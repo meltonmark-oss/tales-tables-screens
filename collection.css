@@ -14,36 +14,93 @@
 [hidden] { display: none !important; }
 html { scroll-padding-top: 8rem; }
 body {
-  --accent: #355742;
-  --soft: #e5eee3;
-  --room: #203c2f;
-  --room-end: #203c2f00;
-  --cover-mat: #e0e8df;
+  --accent: #70492d;
+  --soft: #f2e9d9;
+  --cover-mat: #d7c2a8;
+  --room-background: #2b190e;
+  --room-scene: url("art/books.svg");
+  --room-overlay: linear-gradient(180deg, #210e048f, #2c130545 52%, #221207a5);
+  --room-bar: #24160d;
+  --room-title: #ffe7b2;
+  --room-highlight: #f2ca79;
+  --room-width: 71rem;
+  --nav-background: var(--room-bar);
+  --nav-text: #f0dfc1;
+  --nav-hover: #ffffff15;
+  --nav-selected: var(--room-highlight);
+  --nav-selected-text: #2c2416;
+  --shelf-frame: #9a683c;
+  --shelf-border-width: .44rem;
+  --shelf-background:
+    linear-gradient(90deg, #130801a9, #210d0555 28%, #210d0547 73%, #13080197),
+    repeating-linear-gradient(11deg, #734326 0 3px, #6a3b22 4px 6px, #714126 7px 11px, #754326 12px 19px);
+  --shelf-ledge: linear-gradient(#d6a476 0 16%, #875336 26% 73%, #563115);
   margin: 0;
   min-width: 0;
-  background: var(--paper);
+  background: var(--room-background);
   color: var(--ink);
   font: 1rem/1.5 var(--sans);
 }
 body[data-tab="movies"] {
   --accent: #304c76;
   --soft: #e4ebf5;
-  --room: #182d50;
-  --room-end: #182d5000;
-  --cover-mat: #e0e6ee;
+  --cover-mat: #18356a;
+  --room-background: #0d2462;
+  --room-scene: url("art/movies.svg");
+  --room-overlay: linear-gradient(180deg, #0719469c, #0b246448 57%, #071b41a0);
+  --room-bar: #091735;
+  --room-title: #ffe373;
+  --room-highlight: #ffd13d;
+  --nav-text: #e9edff;
+  --nav-selected-text: #152751;
+  --shelf-frame: #edba31;
+  --shelf-background:
+    linear-gradient(90deg, #061e53a4, transparent 28%, transparent 72%, #061e53a4),
+    repeating-linear-gradient(90deg, #1549a9 0 2px, #14459e 3px 45px, #1748a3 46px 54px);
+  --shelf-ledge: linear-gradient(#ffe58a 0 17%, #f7c943 22% 40%, #c28a1d 82%, #835618);
 }
 body[data-tab="games"] {
-  --accent: #704f2c;
-  --soft: #f0e7d8;
-  --room: #422e1c;
-  --room-end: #422e1c00;
-  --cover-mat: #ece5d6;
+  --accent: #38534a;
+  --soft: #e4ece3;
+  --cover-mat: #e5d9bf;
+  --room-background: #172d29;
+  --room-scene: url("art/games.svg");
+  --room-overlay: linear-gradient(180deg, #091714a6, #09171439 52%, #091714a6);
+  --room-bar: #152522;
+  --room-title: #f9e3b4;
+  --room-highlight: #edc78b;
+  --nav-text: #ebefdc;
+  --shelf-frame: #8f7851;
+  --shelf-background:
+    radial-gradient(circle, #101e18 0 1.15px, #69745b 1.42px, transparent 1.95px) 0 0 / .95rem .95rem,
+    linear-gradient(115deg, #36493e, #2b3e34 59%, #192f28);
 }
 body[data-tab="kids"] {
   --accent: #3e502d;
   --soft: #e8eddc;
   --cover-mat: #e8d6b7;
-  background: #4c311c;
+  --room-background: #4c311c;
+  --room-scene: url("art/treehouse.webp");
+  --room-overlay: linear-gradient(180deg, #171e0e82, #3d240729 45%, #2414068c);
+  --room-bar: #233023;
+  --room-title: #fff0c3;
+  --room-width: 66rem;
+  --nav-background: var(--surface);
+  --nav-text: var(--secondary-text);
+  --nav-hover: var(--paper);
+  --nav-selected: var(--soft);
+  --nav-selected-text: var(--accent);
+  --shelf-frame: #c99258ad;
+  --shelf-border-width: 1px;
+  --shelf-background: linear-gradient(90deg, #3f2113bc, #512d17aa 50%, #3f2113bc);
+  --shelf-ledge: linear-gradient(#f2bb79 0 18%, #c48448 24% 71%, #8a4b25 83%);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--room-overlay), var(--room-scene) center 43% / cover;
 }
 
 button, input, select, textarea { color: inherit; font: inherit; }
@@ -84,7 +141,7 @@ summary::-webkit-details-marker { display: none; }
 .icon-button:hover { background: var(--soft); }
 
 .masthead { position: sticky; top: 0; z-index: 2; box-shadow: 0 2px 14px #29312910; }
-.brand-bar { background: #233027; color: #fff9e9; }
+.brand-bar { background: var(--room-bar); color: #fff9e9; }
 .brand-inner { display: flex; justify-content: space-between; align-items: center; min-height: 4.25rem; gap: 1rem; }
 .brand, .header-actions { display: flex; align-items: center; gap: .7rem; }
 .brand { min-width: 0; }
@@ -133,7 +190,7 @@ summary::-webkit-details-marker { display: none; }
 }
 .utility-actions button:hover { background: var(--soft); }
 .utility-actions p { margin: .4rem .55rem .25rem; font-size: .82rem; color: var(--secondary-text); }
-.section-nav { background: var(--surface); border-bottom: 1px solid var(--line); }
+.section-nav { background: var(--nav-background); border-bottom: 1px solid var(--shelf-frame); }
 .section-links { display: flex; gap: .45rem; padding: .42rem 0; }
 .section-links button {
   display: inline-flex;
@@ -145,36 +202,26 @@ summary::-webkit-details-marker { display: none; }
   border: 1px solid transparent;
   border-radius: .55rem;
   background: transparent;
-  color: var(--secondary-text);
+  color: var(--nav-text);
   text-align: center;
   font-size: .94rem;
   font-weight: 650;
   line-height: 1.15;
   white-space: nowrap;
 }
-.section-links button:hover { background: var(--paper); color: var(--ink); }
-.section-links button[aria-current] { background: var(--soft); border-color: var(--line); color: var(--accent); }
+.section-links button:hover { background: var(--nav-hover); }
+.section-links button[aria-current] { background: var(--nav-selected); border-color: var(--nav-selected); color: var(--nav-selected-text); }
+body:not([data-tab="kids"]) .section-links button:focus-visible { outline-color: var(--room-highlight); }
 
+main { max-width: var(--room-width); }
 .room {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
   display: flex;
   align-items: center;
   margin-block: 1.48rem 1.15rem;
-  min-height: clamp(9rem, 19vw, 13rem);
-  padding: 1.5rem clamp(1.14rem, 4vw, 3.2rem);
-  border-radius: 1.12rem;
-  background: var(--room);
-  color: #fff9eb;
-}
-.room-art { position: absolute; z-index: -2; inset: 0 0 0 auto; width: 73%; height: 100%; object-fit: cover; object-position: center 46%; opacity: .89; }
-.room::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: linear-gradient(90deg, var(--room) 24%, var(--room) 31%, var(--room-end) 80%);
+  min-height: 7.5rem;
+  padding: .8rem .5rem;
+  color: var(--room-title);
+  text-shadow: 0 2px 8px #211609, 0 3px 14px #211609;
 }
 .room h2 { margin: 0; font: 400 clamp(2.2rem, 5vw, 4.15rem)/.99 var(--serif); letter-spacing: -.048em; }
 .room p { margin: .7rem 0 0; color: #f7ead9; font-weight: 500; }
@@ -238,10 +285,13 @@ textarea { resize: vertical; line-height: 1.55; }
   border-top: 1px solid var(--line);
 }
 .results-bar { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin: .9rem 0 .8rem; }
-.results-bar p { margin: 0; color: var(--secondary-text); font-size: .95rem; }
+.results-bar p { margin: 0; font-size: .95rem; }
+.results-bar p, footer a { color: #fff4d7; text-shadow: 0 1px 4px #211008, 0 1px 8px #211008; }
 .view-controls { display: flex; padding: .15rem; gap: .14rem; border: 1px solid var(--line); border-radius: .66rem; background: var(--surface); }
 .view-controls button { width: 2.75rem; padding: 0; color: var(--secondary-text); border-radius: .45rem; }
 .view-controls button[aria-pressed="true"] { color: var(--accent); background: var(--soft); }
+body[data-tab="books"] #gridView, #spinesView { width: auto; padding-inline: .62rem; }
+body:not([data-tab="books"]) #gridView span { display: none; }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(9.35rem, 100%), 1fr)); gap: 1.15rem .92rem; }
 .item { display: flex; min-width: 0; flex-direction: column; gap: .6rem; padding: .6rem; text-align: left; border: 1px solid var(--line); border-radius: .8rem; background: var(--surface); }
@@ -417,7 +467,8 @@ body:has(dialog[open]) { overflow: hidden; }
   .section-links { display: grid; grid-template-columns: minmax(0,.83fr) minmax(0,1.16fr) minmax(0,.85fr) minmax(0,1.14fr); gap: .16rem; }
   .section-links button { padding: .35rem .08rem; gap: .23rem; font-size: .85rem; }
   .section-links .icon { width: .99rem; height: .99rem; }
-  .room { margin-block: .85rem .8rem; }
+  body::before { background-size: 100% 100%; }
+  .room { margin-block: .85rem .8rem; min-height: 6rem; }
   .toolbar { flex-wrap: wrap; gap: .55rem; }
   .search-controls { flex-basis: 100%; }
   .browse-actions { flex: 1; }
@@ -432,8 +483,6 @@ body:has(dialog[open]) { overflow: hidden; }
   .brand-bar .quiet { width: 2.75rem; padding-inline: 0; }
   .brand-bar .quiet span, .add-long { display: none; }
   .brand h1 { font-size: clamp(1.05rem, 4.6vw, 1.3rem); }
-  .room-art { width: 76%; object-position: 61% center; }
-  .room::after { background: linear-gradient(90deg, var(--room) 19%, var(--room) 33%, var(--room-end) 93%); }
   .detail-content { grid-template-columns: minmax(5rem, 6.15rem) 1fr; gap: .75rem; }
   .detail-text { display: contents; }
   .detail-info, .detail-description { grid-column: 1 / -1; margin-top: 0; }
@@ -447,6 +496,8 @@ body:has(dialog[open]) { overflow: hidden; }
 
 @media (max-width: 350px) {
   .brand-symbol { display: none; }
+  .browse-actions { min-width: 0; }
+  .browse-actions button { min-width: 0; padding-inline: .45rem; white-space: normal; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gn-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -465,82 +516,185 @@ body:has(dialog[open]) { overflow: hidden; }
 .edition-preview-info dd { margin: 0; }
 #coverSuggestion img { margin-bottom: .45rem; }
 
-/* Little Tales uses the full treehouse behind its face-out shelves. */
-body[data-tab="kids"]::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(180deg, #171e0e82, #3d240729 45%, #2414068c),
-    url("art/treehouse.webp") center 43% / cover;
-}
-body[data-tab="kids"] .brand-bar { background: #233023; }
-body[data-tab="kids"] main { max-width: 66rem; }
-body[data-tab="kids"] .room {
-  min-height: 7.5rem;
-  padding: .8rem .5rem;
-  background: transparent;
-  text-shadow: 0 2px 8px #231609, 0 3px 14px #231609;
-}
-body[data-tab="kids"] .room::after { display: none; }
-body[data-tab="kids"] .room h2 { color: #fff0c3; }
-body[data-tab="kids"] .results-bar p,
-body[data-tab="kids"] footer a {
-  color: #fff4d7;
-  text-shadow: 0 1px 4px #211008, 0 1px 8px #211008;
-}
-body[data-tab="kids"] .shelf[data-view="grid"] {
+/* Face-out shelves share the same layout with room-specific materials. */
+.shelf:is([data-view="grid"], [data-view="spines"]) {
   --shelf-gap: .9rem;
+  --rail-overhang: calc((var(--shelf-gap) + 2px) / -2);
   overflow: hidden;
   padding: .88rem .65rem 1rem;
-  border: 1px solid #c99258ad;
+  border: var(--shelf-border-width) solid var(--shelf-frame);
   border-radius: .85rem;
-  background: linear-gradient(90deg, #3f2113bc, #512d17aa 50%, #3f2113bc);
-  box-shadow: inset 0 0 32px #2b170d7d, 0 10px 27px #2114097d;
+  background: var(--shelf-background);
+  box-shadow: inset 0 0 32px #16130e66, 0 10px 27px #130e097d;
 }
-body[data-tab="kids"] .shelf[data-view="grid"] .cards { column-gap: var(--shelf-gap); }
-body[data-tab="kids"] .shelf[data-view="grid"] .item {
+.shelf:is([data-view="grid"], [data-view="spines"]) .cards { column-gap: var(--shelf-gap); }
+.shelf:is([data-view="grid"], [data-view="spines"]) .item {
   gap: 0;
   padding: .25rem 0 .42rem;
   border-color: transparent;
   background: transparent;
   text-align: center;
 }
-body[data-tab="kids"] .shelf[data-view="grid"] .item:hover { border-color: #dfaa6f; }
-body[data-tab="kids"] .shelf[data-view="grid"] .item:focus-visible { outline-color: #ffe599; }
-body[data-tab="kids"] .shelf[data-view="grid"] .cover {
+.shelf:is([data-view="grid"], [data-view="spines"]) .item:hover { border-color: var(--room-highlight); }
+.shelf:is([data-view="grid"], [data-view="spines"]) .item:focus-visible { outline-color: #ffe599; }
+.shelf[data-view="grid"] .cover {
   margin-inline: .28rem;
   border: solid #e3ba808a;
   border-width: 1px 3px 0 1px;
-  box-shadow: 2px 4px 8px #211609b0;
+  box-shadow: 2px 4px 8px #17120ab0;
 }
-body[data-tab="kids"] .shelf[data-view="grid"] .cover::after {
+.shelf[data-view="grid"] :is(.cover-books, .cover-kids)::after {
   content: "";
   position: absolute;
   z-index: 1;
   inset: 0 .15rem auto .3rem;
   height: .2rem;
+  pointer-events: none;
   background: repeating-linear-gradient(#f5e9ce 0 1px, #d0b695 1px 2px);
 }
-body[data-tab="kids"] .shelf[data-view="grid"] .item-copy {
-  position: relative;
-  padding: .94rem .11rem .15rem;
-}
-body[data-tab="kids"] .shelf[data-view="grid"] .item-copy::before {
+.shelf[data-view="grid"] .cover-books::before {
   content: "";
   position: absolute;
-  inset: 0 calc((var(--shelf-gap) + 2px) / -2) auto;
-  height: .68rem;
-  background: linear-gradient(#f2bb79 0 18%, #c48448 24% 71%, #8a4b25 83%);
-  box-shadow: 0 3px 4px #2110087a;
+  inset: .05rem auto .05rem 0;
+  z-index: 1;
+  width: .45rem;
+  pointer-events: none;
+  background: linear-gradient(90deg, #1009038c, #ffffff59 44%, #180d0868 80%, #ffffff40);
 }
-body[data-tab="kids"] .shelf[data-view="grid"] .item .label { color: #fff8e6; }
-body[data-tab="kids"] .shelf[data-view="grid"] .item-meta { color: #f6ddba; }
-body[data-tab="kids"] .shelf[data-view="grid"] .empty { background: var(--surface); }
+.shelf[data-view="grid"] .cover-books img {
+  inset: .21rem .12rem .08rem .47rem;
+  width: calc(100% - .59rem);
+  height: calc(100% - .29rem);
+}
+.shelf[data-view="grid"] .cover-movies {
+  border: .23rem solid #12275b;
+  border-left: .48rem solid #263d73;
+  box-shadow: inset 0 0 0 1px #9eafe047, 3px 5px 8px #051b3fa8;
+}
+.shelf:is([data-view="grid"], [data-view="spines"]) .item-copy {
+  position: relative;
+  justify-items: center;
+  padding: .94rem .11rem .15rem;
+}
+body:not([data-tab="games"]) .shelf:is([data-view="grid"], [data-view="spines"]) .item-copy::before {
+  content: "";
+  position: absolute;
+  inset: 0 var(--rail-overhang) auto;
+  height: .68rem;
+  pointer-events: none;
+  background: var(--shelf-ledge);
+  box-shadow: 0 3px 4px #170e087a;
+}
+.shelf[data-view="grid"] .item .label { color: #fff8e6; }
+.shelf[data-view="grid"] .item-meta { color: #f6ddba; }
+body[data-tab="movies"] .shelf[data-view="grid"] .item-meta { color: #e1eaff; }
+body[data-tab="games"] .shelf[data-view="grid"] .item-meta { color: #e0e7d3; }
+.shelf .empty { background: var(--surface); }
+
+.shelf[data-view="spines"] {
+  --shelf-gap: .35rem;
+  --spine-height: clamp(8.6rem, 24vw, 11.8rem);
+}
+.shelf[data-view="spines"] .cards { grid-template-columns: repeat(auto-fill, minmax(min(3.85rem, 100%), 1fr)); }
+.spine-slot { display: flex; align-items: end; height: var(--spine-height); }
+.book-spine {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e3c28780;
+  border-radius: .34rem .36rem .12rem .12rem;
+  background:
+    linear-gradient(90deg, #0005, transparent 19%, #fff2 43%, transparent 53%, #0004 100%),
+    repeating-linear-gradient(14deg, #fffae30d 0 1px, transparent 1px 4px),
+    hsl(var(--cover-hue) 32% 28%);
+  box-shadow: 2px 3px 6px #1e110ab0;
+}
+.item:nth-child(3n) .book-spine { height: 94%; }
+.item:nth-child(3n + 2) .book-spine { height: 98%; }
+.book-spine::before, .book-spine::after {
+  content: "";
+  position: absolute;
+  inset: .49rem .16rem auto;
+  height: 2px;
+  background: #f2d395ac;
+}
+.book-spine::after { inset: auto .16rem .46rem; }
+.spine-title {
+  display: block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  max-width: calc(100% - .28rem);
+  max-height: calc(100% - 1.35rem);
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  color: #fff4d5;
+  font: 600 .92rem/1.1 var(--serif);
+  text-align: center;
+}
+.shelf[data-view="spines"] .loan { font-size: .71rem; }
+
+body[data-tab="games"] .shelf[data-view="grid"] .item {
+  position: relative;
+  isolation: isolate;
+  padding-top: 1.68rem;
+}
+body[data-tab="games"] .shelf[data-view="grid"] .item::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: .34rem var(--rail-overhang) auto;
+  height: .29rem;
+  background: linear-gradient(#c4a670, #51402a);
+  box-shadow: 0 2px 4px #111b15;
+  pointer-events: none;
+}
+body[data-tab="games"] .shelf[data-view="grid"] .item::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: .85rem;
+  height: 1.25rem;
+  inset: .53rem 0 auto;
+  margin-inline: auto;
+  border: .12rem solid #c6a874;
+  border-radius: .46rem .46rem .27rem .27rem;
+  background:
+    radial-gradient(circle at 50% .27rem, #e3c99b 0 .13rem, #80653d .17rem, transparent .19rem),
+    linear-gradient(90deg, #3b2b13, #b19869 56%, #493d24);
+  box-shadow: 1px 1px 3px #14120e;
+  pointer-events: none;
+}
+body[data-tab="games"] .shelf[data-view="grid"] .cover {
+  border: solid #beaa7d;
+  border-width: 1px .22rem .24rem 1px;
+  box-shadow: 4px 5px 8px #081612b8;
+  transition: transform .18s ease, opacity .18s ease;
+}
+body[data-tab="games"] .shelf[data-view="grid"] .item-copy { padding-top: .58rem; }
+@media (hover: hover) {
+  body[data-tab="games"] .shelf[data-view="grid"] .item:hover .cover { transform: translateY(-.28rem); }
+}
+body[data-tab="games"] .shelf[data-view="grid"] .item.lifted .cover { transform: translateY(-.6rem); opacity: .22; }
+body[data-tab="games"] .detail-dialog[open] { animation: lift-game .18s ease-out; }
+@keyframes lift-game {
+  from { transform: translateY(.65rem) scale(.97); opacity: .7; }
+  to { transform: none; opacity: 1; }
+}
+
 @media (max-width: 760px) {
-  body[data-tab="kids"]::before { background-size: 100% 100%; }
-  body[data-tab="kids"] .room { min-height: 6rem; }
-  body[data-tab="kids"] .shelf[data-view="grid"] { --shelf-gap: .42rem; padding-inline: .4rem; }
-  body[data-tab="kids"] .shelf[data-view="grid"] .cover { margin-inline: .16rem; }
+  .shelf:is([data-view="grid"], [data-view="spines"]) { padding-inline: .4rem; }
+  .shelf[data-view="grid"] { --shelf-gap: .42rem; }
+  .shelf[data-view="grid"] .cover { margin-inline: .16rem; }
+  body:not([data-tab="kids"]) .shelf[data-view="grid"] .cards { grid-template-columns: repeat(auto-fill, minmax(min(6rem, 100%), 1fr)); }
+  .shelf[data-view="spines"] .cards { grid-template-columns: repeat(auto-fill, minmax(min(3.1rem, 100%), 1fr)); }
+}
+@media (max-width: 350px) {
+  body[data-tab="books"] #gridView .icon { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-tab="games"] .detail-dialog[open] { animation: none; }
+  body[data-tab="games"] .shelf[data-view="grid"] .cover { transition: none; }
 }

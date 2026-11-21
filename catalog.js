@@ -175,17 +175,22 @@ function icon(name) {
   return '<svg class="icon" aria-hidden="true"><use href="#icon-' + name + '"></use></svg>';
 }
 
+const coverHues = {books: [144, 162, 27, 10, 210, 50], movies: [219, 227, 269, 188], games: [31, 45, 14, 58], kids: [298, 190, 141, 341]};
+
+function coverHue(item, kind) {
+  const colors = coverHues[kind];
+  const code = [...String(item.id)].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  return colors[code % colors.length];
+}
+
 function coverHTML(item, {detail = false, eager = false} = {}) {
   const kind = section(item);
-  const hues = {books: [144, 162, 27, 10, 210, 50], movies: [219, 227, 269, 188], games: [31, 45, 14, 58], kids: [298, 190, 141, 341]};
-  const colors = hues[kind];
-  const code = [...String(item.id)].reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const artwork = artworkFor(item);
   const image = artwork ? '<img ' + (eager || detail ? "" : 'loading="lazy" ') +
     'decoding="async" alt="' + (detail ? "Artwork for " + esc(displayTitle(item)) : "") +
     '" src="' + esc(artwork.url) + '">' : "";
   return '<span class="cover cover-' + kind + (image ? "" : " fallback") + '" data-cover-id="' + esc(item.id) +
-    '" style="--cover-hue:' + colors[code % colors.length] + '"' + (detail ? "" : ' aria-hidden="true"') + '>' +
+    '" style="--cover-hue:' + coverHue(item, kind) + '"' + (detail ? "" : ' aria-hidden="true"') + '>' +
     icon(sections[kind].icon) + '<span class="cover-title">' + esc(displayTitle(item)) + "</span>" + image + "</span>";
 }
 
@@ -223,15 +228,23 @@ function gamePlayerText(item) {
   return range + (range === 1 ? " player" : " players");
 }
 
-function cardHTML(item, index) {
+function cardHTML(item, index, spines) {
   const title = displayTitle(item);
+  const lent = isLent(item);
+  if (spines) {
+    return '<button class="item" type="button" data-id="' + esc(item.id) + '" title="' + esc(title) +
+      '" aria-label="View ' + esc(title) + (lent ? ', lent out' : '') + '">' +
+      '<span class="spine-slot" aria-hidden="true"><span class="book-spine" style="--cover-hue:' + coverHue(item, "books") +
+      '"><span class="spine-title">' + esc(title) + '</span></span></span>' +
+      '<span class="item-copy">' + (lent ? '<span class="loan">Lent out</span>' : '') + '</span></button>';
+  }
   const subtitle = item.type === "Game" ? gamePlayerText(item) || genreParts(item.genre)[0] :
     item.type === "Book" ? item.author || item.format : [item.year, item.format].filter(Boolean).join(" · ");
   const description = descriptionFor(item);
   return '<button class="item" type="button" data-id="' + esc(item.id) + '" aria-label="View ' + esc(title) + '">' +
     coverHTML(item, { eager: index < 4 }) + '<span class="item-copy"><span class="label">' + esc(title) + '</span>' +
     (subtitle ? '<span class="item-meta">' + esc(subtitle) + '</span>' : "") +
-    (isLent(item) ? '<span class="loan">Lent out</span>' : "") +
+    (lent ? '<span class="loan">Lent out</span>' : "") +
     (description ? '<span class="item-description">' + esc(description) + '</span>' : "") +
     "</span></button>";
 }
@@ -253,7 +266,8 @@ function paintCards() {
   const order = $("sort").value === "za" ? "Title Z–A" : "Title A–Z";
   $("summary").textContent = list.length === all.length ? order : list.length + " of " + count(all.length);
   $("random").disabled = !list.length;
-  $("cards").innerHTML = list.length ? list.map(cardHTML).join("") : all.length ?
+  const spines = currentView() === "spines";
+  $("cards").innerHTML = list.length ? list.map((item, index) => cardHTML(item, index, spines)).join("") : all.length ?
     '<div class="empty"><h3>No matches</h3><p>Try another search or clear your filters.</p><button class="button secondary" type="button" id="emptyReset">Clear search and filters</button></div>' :
     '<div class="empty"><h3>This shelf is empty</h3><button class="button secondary" type="button" id="emptyAdd">Add an item</button></div>';
   updateFilterToggle();
@@ -263,12 +277,8 @@ function render() {
   const room = sections[tab];
   document.body.dataset.tab = tab;
   $("heading").textContent = room.room;
-  $("roomArt").hidden = tab === "kids";
-  if (tab !== "kids") {
-    const artPath = "art/" + tab + ".svg";
-    if ($("roomArt").getAttribute("src") !== artPath) $("roomArt").src = artPath;
-  }
-  $("search").placeholder = "Search " + room.search;
+  updateViewControls();
+  $("search").placeholder = tab === "movies" ? "Search movies" : "Search " + room.search;
   $("search").setAttribute("aria-label", "Search " + room.search);
   document.querySelectorAll("[data-go]").forEach(button => {
     if (button.dataset.go === tab) button.setAttribute("aria-current", "page");
@@ -307,13 +317,43 @@ function resetFilters(searchToo = false) {
 }
 
 const VIEW_KEY = "tts_browse_view";
-function setView(view) {
-  const shelf = document.querySelector(".shelf");
-  shelf.dataset.view = view === "list" ? "list" : "grid";
-  document.querySelectorAll("[data-view][aria-pressed]").forEach(button =>
-    button.setAttribute("aria-pressed", String(shelf.dataset.view === button.dataset.view)));
+const SPINES_KEY = "tts_library_spines";
+let browseView = "grid";
+let useSpines = false;
+try {
+  if (localStorage.getItem(VIEW_KEY) === "list") browseView = "list";
+  useSpines = localStorage.getItem(SPINES_KEY) === "true";
+} catch {}
+const viewButtons = document.querySelectorAll(".view-controls button");
+
+function currentView() {
+  return tab === "books" && useSpines ? "spines" : browseView;
 }
-try { setView(localStorage.getItem(VIEW_KEY)); } catch {}
+
+function updateViewControls() {
+  const view = currentView();
+  const library = tab === "books";
+  const gridLabel = library ? "Covers grid view" : "Grid view";
+  document.querySelector(".shelf").dataset.view = view;
+  $("spinesView").hidden = !library;
+  $("gridView").setAttribute("aria-label", gridLabel);
+  $("gridView").title = gridLabel;
+  for (const button of viewButtons) {
+    button.setAttribute("aria-pressed", String(view === button.dataset.view));
+  }
+}
+
+function setView(view) {
+  const previous = currentView();
+  if (tab === "books") useSpines = view === "spines";
+  if (view !== "spines") browseView = view;
+  try {
+    localStorage.setItem(VIEW_KEY, browseView);
+    localStorage.setItem(SPINES_KEY, String(useSpines));
+  } catch {}
+  updateViewControls();
+  if (previous !== currentView() && (previous === "spines" || currentView() === "spines")) paintCards();
+}
 
 $("filterToggle").onclick = () => setFiltersOpen($("filterFields").hidden);
 $("clearFilters").onclick = () => resetFilters();
@@ -321,10 +361,7 @@ for (const id of textFilters) {
   $(id).addEventListener(id === "search" || id === "yearFilter" ? "input" : "change", paintCards);
 }
 document.querySelectorAll("[data-go]").forEach(button => button.onclick = () => switchTab(button.dataset.go));
-document.querySelectorAll("[data-view][aria-pressed]").forEach(button => button.onclick = () => {
-  setView(button.dataset.view);
-  try { localStorage.setItem(VIEW_KEY, button.dataset.view); } catch {}
-});
+viewButtons.forEach(button => button.onclick = () => setView(button.dataset.view));
 document.addEventListener("click", event => {
   if (!$("toolsMenu").contains(event.target)) $("toolsMenu").open = false;
 });
@@ -336,7 +373,10 @@ document.addEventListener("keydown", event => {
 });
 $("cards").addEventListener("click", event => {
   const button = event.target.closest("[data-id]");
-  if (button) showDetails(button.dataset.id);
+  if (button) {
+    if (tab === "games" && currentView() === "grid") button.classList.add("lifted");
+    showDetails(button.dataset.id);
+  }
   if (event.target.closest("#emptyReset")) resetFilters(true);
   if (event.target.closest("#emptyAdd")) edit(null);
 });
@@ -395,10 +435,14 @@ function showDetails(id) {
     (details.length ? '<dl class="detail-info">' + details.map(([label, value]) =>
       '<div><dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd></div>').join("") + '</dl>' : "") + '</div></div>';
   $("detailEdition").hidden = !book;
+  $("returnGame").hidden = !game;
   openDialog("detailModal");
 }
 
-$("closeDetail").onclick = () => closeDialog("detailModal");
+$("closeDetail").onclick = $("returnGame").onclick = () => closeDialog("detailModal");
+$("detailModal").addEventListener("close", () => {
+  $("cards").querySelector(".lifted")?.classList.remove("lifted");
+});
 closeOnEscapeOrBackdrop("detailModal", "closeDetail");
 $("detailEdit").onclick = () => {
   closeDialog("detailModal");
@@ -795,5 +839,10 @@ if(existing.length||byVerifiedTitle){
 }if((scanWantsBook()&&validISBN(code))||/^97[89]\d{10}$/.test(code)){try{const info=await isbnInfo(code);const match=matchingItems(info,"Book");out.innerHTML='<p>'+esc(info.title)+' · '+esc(info.author)+' · '+esc(info.pages||"Unknown")+' pages</p><button id="scanApply">Review this edition</button>'+(match.length?'<p>Existing title: '+esc(match.map(x=>x.title).join(", "))+'</p>':"");$("scanApply").onclick=()=>applyBookInfo(info);$("scanStatus").textContent="Exact ISBN record found; review before saving.";return}catch(e){$("scanStatus").textContent="No ISBN edition record found.";showManualUPC(code,"Could not find that ISBN edition. Enter the details manually.","Book");return}}
 try{const info=await upcInfo(code);if(info){const matches=matchingItems(info,tab==="games"?"Game":"Movie");out.innerHTML='<p>Possible product: '+esc(info.title)+'</p><p style="font-size:13px">Source: '+esc(info.source)+'. Confirm that the title and edition match your copy.</p><button id="scanApplyUPC">Review and save</button>'+(matches.length?'<p>Already in your collection by title: '+esc(matches.map(x=>x.title).join(", "))+'</p>':"");$("scanApplyUPC").onclick=()=>applyUPCInfo(info);$("scanStatus").textContent="Product match found. Review before saving.";return}showManualUPC(code,"No product match found for this UPC. You can search by number or add it manually.");$("scanStatus").textContent="No matching product record."}catch(e){showManualUPC(code,"The UPC lookup service could not be reached from this browser or is rate-limited. The scanner captured the number correctly.");$("scanStatus").textContent="UPC database unavailable; barcode read successfully."}};
 
-if (location.hash === "#kids") switchTab("kids");
+const linkedSection = location.hash.slice(1);
+if (Object.hasOwn(sections, linkedSection) && linkedSection !== tab) switchTab(linkedSection);
 else render();
+window.addEventListener("hashchange", () => {
+  const sectionName = location.hash.slice(1);
+  if (Object.hasOwn(sections, sectionName)) switchTab(sectionName);
+});
