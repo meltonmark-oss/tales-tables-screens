@@ -445,6 +445,7 @@ function edit(id, typeOverride) {
   editionSearchNumber++;
   updateEditorFields();
   openDialog("modal");
+  $("itemForm").scrollTop = 0;
 }
 
 $("add").onclick = () => edit(null);

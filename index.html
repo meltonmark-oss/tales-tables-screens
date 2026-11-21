@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#233027">
   <meta name="description" content="Browse the Melton collection of books, movies, TV, and tabletop games.">
   <title>Tales, Tables &amp; Screens</title>
-  <link rel="stylesheet" href="collection.css?v=41">
+  <link rel="stylesheet" href="collection.css?v=42">
   <script src="catalog-data.js?v=41" defer></script>
   <script src="catalog-details.js?v=41" defer></script>
-  <script src="catalog.js?v=41" defer></script>
+  <script src="catalog.js?v=42" defer></script>
   <script src="movie-art-v29.js?v=35" defer></script>
   <script src="game-night-v24.js?v=41" defer></script>
   <script src="scanner-v26.js?v=28" defer></script>
@@ -168,9 +168,16 @@
 
   <dialog class="modal edit-dialog" id="modal" aria-labelledby="editTitle">
     <div class="panel">
-      <div class="dialog-heading">
-        <h2 id="editTitle">Edit item</h2>
-        <button type="button" id="closeEdit" class="button icon-button" aria-label="Close editor" autofocus><svg class="icon"><use href="#icon-close"/></svg></button>
+      <div class="editor-header">
+        <div class="dialog-heading">
+          <h2 id="editTitle">Edit item</h2>
+          <button type="button" id="closeEdit" class="button icon-button" aria-label="Close editor" autofocus><svg class="icon"><use href="#icon-close"/></svg></button>
+        </div>
+        <div class="editor-actions">
+          <button id="save" type="submit" form="itemForm" class="button primary">Save item</button>
+          <button id="cancel" type="button" class="button secondary">Cancel</button>
+          <button id="delete" type="button" class="button danger" aria-label="Delete item">Delete</button>
+        </div>
       </div>
       <form id="itemForm">
         <div class="fields">
@@ -212,11 +219,6 @@
             <button id="findCover" type="button" class="button secondary">Find matching artwork</button>
             <div id="coverSuggestion" class="field-message" role="status"></div>
           </div>
-        </div>
-        <div class="dialog-actions">
-          <button id="save" type="submit" class="button primary">Save item</button>
-          <button id="cancel" type="button" class="button secondary">Cancel</button>
-          <button id="delete" type="button" class="button danger">Delete item</button>
         </div>
       </form>
     </div>

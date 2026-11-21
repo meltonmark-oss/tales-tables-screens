@@ -339,6 +339,34 @@ body:has(dialog[open]) { overflow: hidden; }
 .modal::backdrop { background: #18221eb8; }
 .scan-dialog { width: min(37rem, 100% - 1.6rem); }
 .modal .panel { padding: clamp(.95rem, 4vw, 1.7rem); }
+.edit-dialog {
+  --editor-gutter: clamp(.95rem, 4vw, 1.7rem);
+  --editor-inset: calc(1.6rem + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+  inset-block: env(safe-area-inset-top) env(safe-area-inset-bottom);
+  max-height: none;
+  overflow: hidden;
+}
+.edit-dialog .panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  max-height: calc(100vh - var(--editor-inset) - 2px);
+  max-height: calc(100dvh - var(--editor-inset) - 2px);
+  padding: 0;
+}
+.editor-header {
+  padding: .55rem var(--editor-gutter) .75rem;
+  border-bottom: 1px solid var(--line);
+}
+.editor-header .dialog-heading { margin-bottom: .45rem; }
+.editor-actions { display: flex; flex-wrap: wrap; gap: .42rem; }
+.editor-actions .button { padding-inline: .65rem; }
+#itemForm {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--editor-gutter);
+  scroll-padding-block: .65rem;
+}
 .dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: .65rem; margin-bottom: .9rem; }
 .dialog-heading h2, .detail-title { margin: 0; font: 500 clamp(1.55rem, 4vw, 2.45rem)/1.1 var(--serif); letter-spacing: -.025em; overflow-wrap: anywhere; }
 .dialog-actions, .button-row { display: flex; align-items: center; flex-wrap: wrap; gap: .54rem; }
@@ -412,7 +440,6 @@ body:has(dialog[open]) { overflow: hidden; }
   .detail-info, .detail-description { grid-column: 1 / -1; margin-top: 0; }
   .detail-title { font-size: 1.53rem; }
   .detail-dialog .dialog-actions { margin-top: .85rem; }
-  .dialog-actions .danger { margin-left: 0; }
 }
 
 @media (max-width: 373px) {
